@@ -122,8 +122,6 @@ public class CSelectPen extends KinView {
       return false;
     if ( super.onTouchEvent( event ) )
       return true;
-    if ( event.getAction() == MotionEvent.ACTION_UP )
-      return true;
 
     return true;
   }

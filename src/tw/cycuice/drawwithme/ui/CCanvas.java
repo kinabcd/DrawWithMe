@@ -32,16 +32,95 @@ public class CCanvas extends KinView implements IUI {
     int mPen;
     int mColor;
     int mSize;
-    Object mPares[];
+    Rect mViewRect;
+    List<KinPoint> mPath;
+    Rect mBitmapRect;
+    Bitmap mBitmap;
+    Paint mPaint;
+    int mLastDrawPointIndex;
 
-    Action(int op, Object[] pares, int pen, int color, int size) {
+    Action(int op, Rect view, int pen, int color, int size) {
       mOpre = op;
       mPen = pen;
       mColor = color;
       mSize = size;
-      mPares = pares;
+      mPath = new LinkedList<KinPoint>();
+      mViewRect = new Rect( view );
+
+      mLastDrawPointIndex = 0;
+      mBitmapRect = new Rect();
+      mBitmapRect.top = 0;
+      mBitmapRect.left = 0;
+      mBitmapRect.bottom = mViewRect.bottom - mViewRect.top;
+      mBitmapRect.right = mViewRect.right - mViewRect.left;
+      mPaint = new Paint();
+      mPaint.setStyle( Style.FILL );
+      mPaint.setAntiAlias( true );
+      mPaint.setColor( color );
+      mPaint.setStrokeWidth( mSize );
+      if ( pen == CConstant.PENERASER )
+        mPaint.setColor( mBackgroundColor );
+      if ( pen == CConstant.PENHIGHLIGHTER )
+        mPaint.setAlpha( 12 );
+      if ( pen == CConstant.PENWATERCOLOR )
+        mPaint.setAlpha( 3 );
     }
 
+    void AddPoint( KinPoint p ) {
+      KinPoint np = new KinPoint( p );
+      np.x -= mViewRect.left;
+      np.y -= mViewRect.top;
+      mPath.add( np );
+    }
+
+    void Draw( Canvas canvas ) {
+      Draw( canvas, mViewRect );
+    }
+
+    void Draw( Canvas canvas, Rect drawRect ) {
+      if ( mBitmap == null )
+        mBitmap = Bitmap.createBitmap( mBitmapRect.right, mBitmapRect.bottom, Bitmap.Config.ARGB_8888 );
+      for ( int i = mLastDrawPointIndex; i < mPath.size(); i += 1 ) {
+        if ( i == 0 )
+          DrawPoint( mPath.get( i ) );
+        else
+          DrawLine( mPath.get( i - 1 ), mPath.get( i ) );
+        mLastDrawPointIndex = i;
+      }
+
+      canvas.drawBitmap( mBitmap, mBitmapRect, drawRect, null );
+
+    }
+
+    void DrawPoint( KinPoint p1 ) {
+      Canvas newCanvas = new Canvas( mBitmap );
+      newCanvas.drawCircle( (float) p1.x, (float) p1.y, mSize / 2, mPaint );
+    }
+
+    void DrawLine( KinPoint p1, KinPoint p2 ) {
+      Canvas newCanvas = new Canvas( mBitmap );
+      if ( Math.abs( p1.x - p2.x ) > Math.abs( p1.y - p2.y ) ) {
+        if ( p1.x > p2.x ) {
+          KinPoint temp = p1;
+          p1 = p2;
+          p2 = temp;
+        }
+        for ( int i = (int) p1.x; i < p2.x; i += 1 ) {
+          float myY = (float) ( ( i - p1.x ) / ( p2.x - p1.x ) * ( p2.y - p1.y ) + p1.y );
+          newCanvas.drawCircle( i, myY, mSize / 2, mPaint );
+        }
+      } else {
+        if ( p1.y > p2.y ) {
+          KinPoint temp = p1;
+          p1 = p2;
+          p2 = temp;
+        }
+        for ( int i = (int) p1.y; i < p2.y; i += 1 ) {
+          float myX = (float) ( ( i - p1.y ) / ( p2.y - p1.y ) * ( p2.x - p1.x ) + p1.x );
+          newCanvas.drawCircle( myX, i, mSize / 2, mPaint );
+        }
+      }
+    }
   }
 
   // TODO MiniMap
@@ -49,9 +128,8 @@ public class CCanvas extends KinView implements IUI {
   Canvas mCanvas;
   Rect WindowRect; // 螢幕上顯示的範圍
   Rect ViewRect; // 畫布要轉畫到螢幕的範圍
-  Paint mPaint[];
   KinPoint lastTouchPoint = null;
-  int mBGColor;
+  int mBackgroundColor;
   Action newAction;
   List<Action> mActions;
   CSelectPen mUISelectPen;
@@ -68,7 +146,7 @@ public class CCanvas extends KinView implements IUI {
     mBitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 );
     mCanvas = new Canvas( mBitmap );
     mCanvas.drawColor( color );
-    mBGColor = color;
+    mBackgroundColor = color;
 
   }
 
@@ -77,42 +155,11 @@ public class CCanvas extends KinView implements IUI {
     mHasUpdate = false;
     while ( !mActions.isEmpty() ) {
       Action exe = mActions.remove( 0 );
-      if ( exe.mPen == CConstant.PENNORMAL || exe.mPen == CConstant.PENERASER ) {
-        Paint paint = new Paint();
-        paint.setColor( exe.mPen == CConstant.PENNORMAL ? exe.mColor : mBGColor );
-        paint.setStrokeWidth( exe.mSize );
-        paint.setStyle( Style.FILL );
-        paint.setAntiAlias( true );
-        if ( exe.mOpre == 1 )
-          DrawPoint( (KinPoint) exe.mPares[0], paint );
-        else if ( exe.mOpre == 2 )
-          DrawLine( (KinPoint) exe.mPares[0], (KinPoint) exe.mPares[1], paint );
-      } else if ( exe.mPen == CConstant.PENHIGHLIGHTER || exe.mPen == CConstant.PENWATERCOLOR ) {
-        Paint paint = new Paint();
-        paint.setColor( exe.mColor );
-        paint.setAlpha( exe.mPen == CConstant.PENHIGHLIGHTER ? 12 : 3 );
-        paint.setStrokeWidth( exe.mSize );
-        paint.setStyle( Style.FILL );
-        paint.setAntiAlias( true );
-        if ( exe.mOpre == 1 )
-          DrawPoint( (KinPoint) exe.mPares[0], paint );
-        else if ( exe.mOpre == 2 )
-          DrawLine( (KinPoint) exe.mPares[0], (KinPoint) exe.mPares[1], paint );
-      } else if ( exe.mPen == CConstant.PENNEON ) {
-        Paint paint = new Paint();
-        paint.setColor( Color.WHITE );
-        paint.setStrokeWidth( (int) ( exe.mSize / 0.7 ) );
-        paint.setStyle( Style.FILL );
-        paint.setAntiAlias( true );
-        if ( exe.mOpre == 1 )
-          DrawPoint( (KinPoint) exe.mPares[0], paint );
-        else if ( exe.mOpre == 2 )
-          DrawLine( (KinPoint) exe.mPares[0], (KinPoint) exe.mPares[1], paint );
-
-      }
-
+      exe.Draw( mCanvas );
     }
     canvas.drawBitmap( mBitmap, ViewRect, WindowRect, null );
+    if ( newAction != null )
+      newAction.Draw( canvas, WindowRect );
     mTopbarBG.Draw( canvas, 0, 0 );
     super.Draw( canvas );
   }
@@ -195,14 +242,6 @@ public class CCanvas extends KinView implements IUI {
   public boolean onTouchEvent( MotionEvent event ) {
     if ( super.onTouchEvent( event ) )
       return true;
-    if ( event.getX() < WindowRect.left )
-      return false;
-    if ( event.getX() > WindowRect.right )
-      return false;
-    if ( event.getY() < WindowRect.top )
-      return false;
-    if ( event.getY() > WindowRect.bottom )
-      return false;
     float x = event.getX();
     float y = event.getY();
     double yrate = (double) ( ViewRect.bottom - ViewRect.top ) / (double) ( WindowRect.bottom - WindowRect.top );
@@ -210,55 +249,23 @@ public class CCanvas extends KinView implements IUI {
     int xOnStage = (int) ( ( x - WindowRect.left ) * xrate ) + ViewRect.left;
     int yOnStage = (int) ( ( y - WindowRect.top ) * yrate ) + ViewRect.top;
     KinPoint touchPoint = new KinPoint( xOnStage, yOnStage );
-    Object temp[];
-    switch ( event.getAction() ) {
-    case MotionEvent.ACTION_DOWN:
-      lastTouchPoint = touchPoint;
-      break;
-    case MotionEvent.ACTION_MOVE:
-      temp = new Object[3];
-      temp[0] = lastTouchPoint;
-      temp[1] = touchPoint;
-      mActions.add( new Action( 2, temp, mUISelectPen.GetPen(), mUISelectColor.GetColor(), mUISelectPen.GetSize() ) );
-      lastTouchPoint = touchPoint;
-      break;
-    case MotionEvent.ACTION_UP:
-      temp = new Object[2];
-      temp[0] = touchPoint;
-      mActions.add( new Action( 1, temp, mUISelectPen.GetPen(), mUISelectColor.GetColor(), mUISelectPen.GetSize() ) );
-      break;
+    if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
+      if ( x < WindowRect.left || x > WindowRect.right )
+        return false;
+      if ( y < WindowRect.top || y > WindowRect.bottom )
+        return false;
+      newAction = new Action( 0, ViewRect, mUISelectPen.GetPen(), mUISelectColor.GetColor(), mUISelectPen.GetSize() );
+      newAction.AddPoint( touchPoint );
+    }
+    if ( event.getAction() == MotionEvent.ACTION_MOVE ) {
+      newAction.AddPoint( touchPoint );
+    }
+    if ( event.getAction() == MotionEvent.ACTION_UP ) {
+      newAction.AddPoint( touchPoint );
+      mActions.add( newAction );
+      newAction = null;
     }
     return true;
-  }
-
-  void DrawPoint( KinPoint p1, Paint paint ) {
-    mCanvas.drawCircle( (float) p1.x, (float) p1.y, paint.getStrokeWidth() / 2, paint );
-    mHasUpdate = true;
-  }
-
-  void DrawLine( KinPoint p1, KinPoint p2, Paint paint ) {
-    if ( Math.abs( p1.x - p2.x ) > Math.abs( p1.y - p2.y ) ) {
-      if ( p1.x > p2.x ) {
-        KinPoint temp = p1;
-        p1 = p2;
-        p2 = temp;
-      }
-      for ( int i = (int) p1.x; i < p2.x; i += 1 ) {
-        float myY = (float) ( ( i - p1.x ) / ( p2.x - p1.x ) * ( p2.y - p1.y ) + p1.y );
-        mCanvas.drawCircle( i, myY, paint.getStrokeWidth() / 2, paint );
-      }
-    } else {
-      if ( p1.y > p2.y ) {
-        KinPoint temp = p1;
-        p1 = p2;
-        p2 = temp;
-      }
-      for ( int i = (int) p1.y; i < p2.y; i += 1 ) {
-        float myX = (float) ( ( i - p1.y ) / ( p2.y - p1.y ) * ( p2.x - p1.x ) + p1.x );
-        mCanvas.drawCircle( myX, i, paint.getStrokeWidth() / 2, paint );
-      }
-    }
-    mHasUpdate = true;
   }
 
   @Override

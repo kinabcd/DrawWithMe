@@ -1,13 +1,11 @@
 package tw.cycuice.drawwithme;
 
-import tw.cycuice.drawwithme.ui.CCanvas;
+import tw.cycuice.drawwithme.ui.CDrawBoard;
 import tw.cycuice.drawwithme.ui.CMenu;
 import tw.cycuice.drawwithme.ui.CNew;
 import tw.cycuice.drawwithme.ui.IUI;
 import tw.kin.android.KinImage;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -28,7 +26,7 @@ public class DrawSurface extends SurfaceView implements Callback {
   int ViewHeight;
   SurfaceHolder sfh;
   IUI mUIs;
-  CCanvas mUICanvas;
+  CDrawBoard mUICanvas;
   CMenu mUIMenu;
   CNew mUINew;
   static DrawSurface sInstance = null;
@@ -94,32 +92,19 @@ public class DrawSurface extends SurfaceView implements Callback {
   }
 
   public boolean onKeyDown( int keycode, KeyEvent event ) {
-    if ( keycode == KeyEvent.KEYCODE_BACK ) {
-      if ( mPageStatus == CConstant.PAGECANVAS ) {
-        AlertDialog.Builder ad = new AlertDialog.Builder( Main.sInstance );
-        ad.setTitle( "Quit" );
-        ad.setMessage( "Do you want to save it?" );
-        ad.setNegativeButton( "No", new DialogInterface.OnClickListener() {
-          public void onClick( DialogInterface dialog, int which ) {
-            SetPage( CConstant.PAGEMENU );
-          }
-        } );
-
-        ad.setPositiveButton( "Yes", new DialogInterface.OnClickListener() {
-          public void onClick( DialogInterface dialog, int whichButton ) {
-            mUICanvas.Save();
-            SetPage( CConstant.PAGEMENU );
-          }
-        } );
-        ad.setCancelable( true );
-        ad.show();
-      } else if ( mPageStatus == CConstant.PAGENEW ) {
-        SetPage( CConstant.PAGEMENU );
-      } else {
+    if ( mPageStatus == CConstant.PAGECANVAS ) {
+      if ( mUICanvas.onKeyDown( keycode, event ) )
+        return true;
+    } else if ( mPageStatus == CConstant.PAGENEW ) {
+      if ( mUINew.onKeyDown( keycode, event ) )
+        return true;
+    } else {
+      if ( keycode == KeyEvent.KEYCODE_BACK ) {
         Main.sInstance.finish();
+        return true;
       }
-      return true;
     }
+
     return super.onKeyDown( keycode, event );
   }
 
@@ -163,7 +148,7 @@ public class DrawSurface extends SurfaceView implements Callback {
       }
       mUIMenu = new CMenu();
       mUINew = new CNew();
-      mUICanvas = new CCanvas();
+      mUICanvas = new CDrawBoard();
       mUIMenu.LoadContent();
       mUINew.LoadContent();
       mUICanvas.LoadContent();

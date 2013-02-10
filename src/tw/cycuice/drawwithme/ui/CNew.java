@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.view.KeyEvent;
 
 public class CNew extends KinView implements IUI {
   KinImage mBackground;
@@ -154,14 +155,22 @@ public class CNew extends KinView implements IUI {
 
   @Override
   public void onQuit( IUI to ) {
-    if ( to instanceof CCanvas ) {
-      CCanvas canvas = (CCanvas) to;
+    if ( to instanceof CDrawBoard ) {
+      CDrawBoard canvas = (CDrawBoard) to;
       int width = mSizeBarX.GetSeekValue();
       int height = mSizeBarY.GetSeekValue();
       int color = mUISelectColor.GetColor();
-      canvas.New( width, height, color );
+      canvas.mUICanvas.New( width, height, color );
     }
 
   }
 
+  @Override
+  public boolean onKeyDown( int keycode, KeyEvent event ) {
+    if ( keycode == KeyEvent.KEYCODE_BACK ) {
+      DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
+      return true;
+    }
+    return false;
+  }
 }

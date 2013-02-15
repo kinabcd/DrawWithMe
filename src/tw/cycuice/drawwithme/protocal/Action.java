@@ -13,6 +13,7 @@ import android.graphics.Paint.Style;
 
 public class Action {
 
+  Bitmap mBitmap;
   int mOpre;
   int mPen;
   int mColor;
@@ -20,15 +21,14 @@ public class Action {
   Rect mViewRect;
   List<KinPoint> mPath;
   Rect mBitmapRect;
-  Bitmap mBitmap;
   Paint mPaint;
   int mLastDrawPointIndex;
 
-  public Action(int op, Rect view, int pen, int color, int size) {
+  public Action(int op, Rect view, int pen, int penColor, int penSize) {
     mOpre = op;
     mPen = pen;
-    mColor = color;
-    mSize = size;
+    mColor = penColor;
+    mSize = penSize;
     mPath = new LinkedList<KinPoint>();
     mViewRect = new Rect( view );
 
@@ -41,7 +41,7 @@ public class Action {
     mPaint = new Paint();
     mPaint.setStyle( Style.FILL );
     mPaint.setAntiAlias( true );
-    mPaint.setColor( color );
+    mPaint.setColor( penColor );
     mPaint.setStrokeWidth( mSize );
     if ( pen == CConstant.PENHIGHLIGHTER )
       mPaint.setAlpha( 12 );
@@ -70,14 +70,14 @@ public class Action {
         DrawLine( mPath.get( i - 1 ), mPath.get( i ) );
       mLastDrawPointIndex = i;
     }
-
+    
     canvas.drawBitmap( mBitmap, mBitmapRect, drawRect, null );
 
   }
 
   void DrawPoint( KinPoint p1 ) {
     Canvas newCanvas = new Canvas( mBitmap );
-    newCanvas.drawCircle( (float) p1.x, (float) p1.y, mSize / 2, mPaint );
+    newCanvas.drawCircle( (float) p1.x, (float) p1.y, mSize / 2f, mPaint );
   }
 
   void DrawLine( KinPoint p1, KinPoint p2 ) {
@@ -90,7 +90,7 @@ public class Action {
       }
       for ( int i = (int) p1.x; i < p2.x; i += 1 ) {
         float myY = (float) ( ( i - p1.x ) / ( p2.x - p1.x ) * ( p2.y - p1.y ) + p1.y );
-        newCanvas.drawCircle( i, myY, mSize / 2, mPaint );
+        newCanvas.drawCircle( i, myY, mSize / 2f, mPaint );
       }
     } else {
       if ( p1.y > p2.y ) {
@@ -100,7 +100,7 @@ public class Action {
       }
       for ( int i = (int) p1.y; i < p2.y; i += 1 ) {
         float myX = (float) ( ( i - p1.y ) / ( p2.y - p1.y ) * ( p2.x - p1.x ) + p1.x );
-        newCanvas.drawCircle( myX, i, mSize / 2, mPaint );
+        newCanvas.drawCircle( myX, i, mSize / 2f, mPaint );
       }
     }
   }

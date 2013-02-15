@@ -110,15 +110,6 @@ public class DrawSurface extends SurfaceView implements Callback {
 
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
-    int ac = event.getAction();
-    if ( ac == MotionEvent.ACTION_DOWN )
-      ;
-    else if ( ac == MotionEvent.ACTION_MOVE )
-      ;
-    else if ( ac == MotionEvent.ACTION_UP )
-      ;
-    else
-      return false;
     if ( mUIs.onTouchEvent( event ) ) {
       UpdateView();
       return true;

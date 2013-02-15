@@ -1,8 +1,8 @@
 package tw.cycuice.drawwithme;
 
 public class CConstant {
-  public final static int MaxHeight = 2048;
-  public final static int MaxWidth = 2048;
+  public final static int MaxHeight = 1680;
+  public final static int MaxWidth = 1680;
   public final static int MaxPenSize = 30;
   public final static int NOTLOADING = 0;
   public final static int PAGEMENU = 1;

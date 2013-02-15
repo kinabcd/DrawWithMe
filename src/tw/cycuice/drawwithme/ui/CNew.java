@@ -2,6 +2,7 @@ package tw.cycuice.drawwithme.ui;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
+import tw.cycuice.drawwithme.Main;
 import tw.cycuice.drawwithme.R;
 import tw.cycuice.drawwithme.widget.CSelectColor;
 import tw.kin.android.KinImage;
@@ -14,6 +15,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 public class CNew extends KinView implements IUI {
   KinImage mBackground;
@@ -39,11 +41,6 @@ public class CNew extends KinView implements IUI {
   }
 
   public void LoadContent() {
-    // mBarXArrow = new KinImage();
-    // mBarXArrow.AddImage( R.drawable.arrow_x, -1 );
-    // mBarYArrow = new KinImage();
-    // mBarYArrow.AddImage( R.drawable.arrow_y, -1 );
-
     mBackground = new KinImage();
     mBackground.AddImage( R.drawable.menu_bg, -1 );
     mOK = new KinImage();
@@ -52,6 +49,10 @@ public class CNew extends KinView implements IUI {
     mBOK.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
+        if ( mSizeBarX.GetSeekValue() < 1 || mSizeBarY.GetSeekValue() < 1 ) {
+          Toast.makeText( Main.sInstance, "Create Fail!!", Toast.LENGTH_SHORT ).show();
+          return;
+        }
         DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
       }
     } );
@@ -117,8 +118,6 @@ public class CNew extends KinView implements IUI {
     mCPaint.setColor( mUISelectColor.GetColor() );
     canvas.drawRect( mC, mCPaint );
     canvas.drawRect( mC, mCPaintStroke );
-    // mBarXArrow.Draw( canvas, mC.right, mC.bottom );
-    // mBarYArrow.Draw( canvas, mC.left - mBarYArrow.GetWidth(), mC.top - mBarYArrow.GetHeight() );
     canvas.drawText( height + " x " + width, mMaxC.left, mMaxC.top - 3, mTextPaint );
     super.Draw( canvas );
   }
@@ -137,8 +136,6 @@ public class CNew extends KinView implements IUI {
     mDefaultWidth = (int) windowWidth;
     mSizeBarX.SetSeekValue( mDefaultWidth );
     mSizeBarY.SetSeekValue( mDefaultHeight );
-    // mBarXArrow.SetSize( windowWidth * 0.05, windowWidth * 0.125 );
-    // mBarYArrow.SetSize( windowWidth * 0.125, windowWidth * 0.05 );
     mSizeBarX.SetPos( mMaxC.left, (int) ( windowWidth * 0.825 ), mMaxC.right, (int) ( windowWidth * 0.95 ) );
     mSizeBarY.SetPos( (int) ( windowWidth * 0.05 ), mMaxC.top, (int) ( windowWidth * 0.175 ), mMaxC.bottom );
 

@@ -183,6 +183,8 @@ public class CSelectPen extends KinView {
   }
 
   public int GetSize() {
+    if ( mSize < 1 )
+      return 1;
     return mSize;
   }
 

@@ -5,22 +5,18 @@ import java.util.List;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.kin.android.KinPoint;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 
 public class Action {
-
-  Bitmap mBitmap;
   int mOpre;
   int mPen;
   int mColor;
   int mSize;
-  Rect mViewRect;
+  KinPoint mStartPoint;
   List<KinPoint> mPath;
-  Rect mBitmapRect;
   Paint mPaint;
   int mLastDrawPointIndex;
 
@@ -30,14 +26,8 @@ public class Action {
     mColor = penColor;
     mSize = penSize;
     mPath = new LinkedList<KinPoint>();
-    mViewRect = new Rect( view );
-
+    mStartPoint = new KinPoint( view.left, view.top );
     mLastDrawPointIndex = 0;
-    mBitmapRect = new Rect();
-    mBitmapRect.top = 0;
-    mBitmapRect.left = 0;
-    mBitmapRect.bottom = mViewRect.bottom - mViewRect.top;
-    mBitmapRect.right = mViewRect.right - mViewRect.left;
     mPaint = new Paint();
     mPaint.setStyle( Style.FILL );
     mPaint.setAntiAlias( true );
@@ -51,56 +41,70 @@ public class Action {
 
   public void AddPoint( KinPoint p ) {
     KinPoint np = new KinPoint( p );
-    np.x -= mViewRect.left;
-    np.y -= mViewRect.top;
+    np.x -= mStartPoint.x;
+    np.y -= mStartPoint.y;
     mPath.add( np );
   }
 
   public void Draw( Canvas canvas ) {
-    Draw( canvas, mViewRect );
+    for ( int i = 0; i < mPath.size(); i += 1 ) {
+      if ( i == 0 )
+        DrawPoint( canvas, mStartPoint, mPath.get( i ) );
+      else
+        DrawLine( canvas, mStartPoint, mPath.get( i - 1 ), mPath.get( i ) );
+    }
   }
 
-  public void Draw( Canvas canvas, Rect drawRect ) {
-    if ( mBitmap == null )
-      mBitmap = Bitmap.createBitmap( mBitmapRect.right, mBitmapRect.bottom, Bitmap.Config.ARGB_8888 );
+  public void Preview( Canvas canvas, double scaleRete ) {
+    KinPoint sp = new KinPoint( 0, 0 );
+    canvas.save();
+    canvas.scale( (float) scaleRete, (float) scaleRete );
     for ( int i = mLastDrawPointIndex; i < mPath.size(); i += 1 ) {
       if ( i == 0 )
-        DrawPoint( mPath.get( i ) );
+        DrawPoint( canvas, sp, mPath.get( i ) );
       else
-        DrawLine( mPath.get( i - 1 ), mPath.get( i ) );
+        DrawLine( canvas, sp, mPath.get( i - 1 ), mPath.get( i ) );
       mLastDrawPointIndex = i;
     }
-    
-    canvas.drawBitmap( mBitmap, mBitmapRect, drawRect, null );
-
+    canvas.restore();
   }
 
-  void DrawPoint( KinPoint p1 ) {
-    Canvas newCanvas = new Canvas( mBitmap );
-    newCanvas.drawCircle( (float) p1.x, (float) p1.y, mSize / 2f, mPaint );
+  void DrawPoint( Canvas canvas, KinPoint startpoint, KinPoint p1 ) {
+    float x = (float) ( startpoint.x + p1.x );
+    float y = (float) ( startpoint.y + p1.y );
+    canvas.drawCircle( x, y, mSize / 2f, mPaint );
   }
 
-  void DrawLine( KinPoint p1, KinPoint p2 ) {
-    Canvas newCanvas = new Canvas( mBitmap );
-    if ( Math.abs( p1.x - p2.x ) > Math.abs( p1.y - p2.y ) ) {
-      if ( p1.x > p2.x ) {
-        KinPoint temp = p1;
-        p1 = p2;
-        p2 = temp;
+  void DrawLine( Canvas canvas, KinPoint startpoint, KinPoint p1, KinPoint p2 ) {
+    float x1 = (float) ( startpoint.x + p1.x );
+    float y1 = (float) ( startpoint.y + p1.y );
+    float x2 = (float) ( startpoint.x + p2.x );
+    float y2 = (float) ( startpoint.y + p2.y );
+    if ( Math.abs( x1 - x2 ) > Math.abs( y1 - y2 ) ) {
+      if ( x1 > x2 ) {
+        float xtemp = x1;
+        float ytemp = y1;
+        x1 = x2;
+        y1 = y2;
+        x2 = xtemp;
+        y2 = ytemp;
       }
-      for ( int i = (int) p1.x; i < p2.x; i += 1 ) {
-        float myY = (float) ( ( i - p1.x ) / ( p2.x - p1.x ) * ( p2.y - p1.y ) + p1.y );
-        newCanvas.drawCircle( i, myY, mSize / 2f, mPaint );
+      for ( int i = (int) x1; i < x2; i += 1 ) {
+        float myY = (float) ( ( i - x1 ) / ( x2 - x1 ) * ( y2 - y1 ) + y1 );
+        canvas.drawCircle( i, myY, mSize / 2f, mPaint );
       }
     } else {
-      if ( p1.y > p2.y ) {
-        KinPoint temp = p1;
-        p1 = p2;
-        p2 = temp;
+      if ( y1 > y2 ) {
+        float xtemp = x1;
+        float ytemp = y1;
+        x1 = x2;
+        y1 = y2;
+        x2 = xtemp;
+        y2 = ytemp;
       }
-      for ( int i = (int) p1.y; i < p2.y; i += 1 ) {
-        float myX = (float) ( ( i - p1.y ) / ( p2.y - p1.y ) * ( p2.x - p1.x ) + p1.x );
-        newCanvas.drawCircle( myX, i, mSize / 2f, mPaint );
+      for ( int i = (int) y1; i < y2; i += 1 ) {
+        float myX = (float) ( ( i - y1 ) / ( y2 - y1 ) * ( x2 - x1 ) + x1 );
+        canvas.drawCircle( myX, i, mSize / 2f, mPaint );
       }
     }
   }

@@ -3,10 +3,13 @@ package tw.cycuice.drawwithme.widget;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.protocal.Action;
+import tw.cycuice.drawwithme.protocal.CModeSingle;
+import tw.cycuice.drawwithme.protocal.IModeProtocal;
 import tw.cycuice.drawwithme.ui.CDrawBoard;
 import tw.kin.android.KinPoint;
 import tw.kin.android.KinView;
@@ -22,14 +25,17 @@ import android.widget.Toast;
 
 public class CCanvas extends KinView {
   enum MODE {
-    DRAW, MOVE, SCALE
+    WAIT, DRAW, MOVE, SCALE
   };
 
+  IModeProtocal mProtocal;
   Bitmap mBitmap;
   Canvas mCanvas;
   Rect mWindowRect; // 螢幕上顯示的範圍
   int mBackgroundColor;
   Action mNewAction;
+  Bitmap mNewActionBitmap; // 大小與螢幕顯示範圍相同
+  Canvas mNewActionCanvas;
   String pc;
   KinPoint mDownCenterPoint;
   double mDownLength;
@@ -43,12 +49,6 @@ public class CCanvas extends KinView {
   public CCanvas() {
   }
 
-  public void Apply( Action action ) {
-    if ( action == null )
-      return;
-    action.Draw( mCanvas );
-  }
-
   public void New( int width, int height, int bgColor ) {
     mBitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 );
     mCanvas = new Canvas( mBitmap );
@@ -57,7 +57,11 @@ public class CCanvas extends KinView {
     mViewStart = new KinPoint( 0, 0 );
     mViewScaleRate = 1;
     mViewSize = new KinPoint( mWindowRect.right - mWindowRect.left, mWindowRect.bottom - mWindowRect.top );
-    mTouchMode = MODE.DRAW;
+    mNewActionBitmap = Bitmap.createBitmap( (int) mViewSize.x, (int) mViewSize.y, Bitmap.Config.ARGB_8888 );
+    mNewActionCanvas = new Canvas( mNewActionBitmap );
+
+    mProtocal = new CModeSingle();
+    mTouchMode = MODE.WAIT;
   }
 
   public void ChangeMode( MODE mode, MotionEvent event ) {
@@ -68,12 +72,25 @@ public class CCanvas extends KinView {
       mDownCenterPoint = ToCanvasPoint( centerPointOnScreen );
       mDownLength = Math.sqrt( Math.pow( event.getX( 0 ) - event.getX( 1 ), 2 ) + Math.pow( event.getY( 0 ) - event.getY( 1 ), 2 ) );
       mViewScaleRateOld = mViewScaleRate;
-    }
-    if ( mode == MODE.MOVE ) {
+    } else if ( mode == MODE.MOVE ) {
       mTouchMode = MODE.MOVE;
       mDownCenterPoint = null;
-    }
-    if ( mode == MODE.DRAW ) {
+    } else if ( mode == MODE.DRAW ) {
+      KinPoint screenPoint = new KinPoint( event.getX(), event.getY() );
+      int pen = ( (CDrawBoard) GetParent() ).mUISelectPen.GetPen();
+      int color = ( (CDrawBoard) GetParent() ).mUISelectColor.GetColor();
+      int size = ( (CDrawBoard) GetParent() ).mUISelectPen.GetSize();
+      if ( pen == CConstant.PENERASER )
+        color = mBackgroundColor;
+      mNewActionBitmap.eraseColor( Color.TRANSPARENT );
+      mNewAction = new Action( 0, mViewRect, pen, color, size );
+      mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
+      mTouchMode = MODE.DRAW;
+    } else if ( mode == MODE.WAIT ) {
+      if ( mNewAction != null ) {
+        mProtocal.PushAction( mNewAction );
+        mNewAction = null;
+      }
       if ( mViewSize.x * mViewScaleRate > mBitmap.getWidth() && mViewSize.y * mViewScaleRate > mBitmap.getHeight() ) {
         double mViewScaleRateX = mBitmap.getWidth() / mViewSize.x;
         double mViewScaleRateY = mBitmap.getHeight() / mViewSize.y;
@@ -91,8 +108,7 @@ public class CCanvas extends KinView {
         mViewStart.x = 0;
       if ( mViewStart.y < 0 )
         mViewStart.y = 0;
-
-      mTouchMode = MODE.DRAW;
+      mTouchMode = MODE.WAIT;
     }
   }
 
@@ -114,7 +130,7 @@ public class CCanvas extends KinView {
       pc += "(" + event.getX( i ) + "," + event.getY( i ) + ")";
 
     if ( event.getAction() == MotionEvent.ACTION_CANCEL ) // 第三指下
-      ChangeMode( MODE.DRAW, event );
+      ChangeMode( MODE.WAIT, event );
 
     if ( mTouchMode == MODE.SCALE ) {
       if ( ( event.getAction() & MotionEvent.ACTION_MASK ) == MotionEvent.ACTION_POINTER_UP ) // 第二點起
@@ -131,10 +147,9 @@ public class CCanvas extends KinView {
         mViewStart.y -= newCenterPoint.y - mDownCenterPoint.y;
         mHasUpdate = true;
       }
-      return true;
     } else if ( mTouchMode == MODE.MOVE ) {
       if ( event.getAction() == MotionEvent.ACTION_UP ) // 第一點起
-        ChangeMode( MODE.DRAW, event );
+        ChangeMode( MODE.WAIT, event );
       if ( event.getAction() == MotionEvent.ACTION_MOVE ) { // 單指移動
         KinPoint newCenterPoint = ToCanvasPoint( new KinPoint( event.getX(), event.getY() ) );
         if ( mDownCenterPoint != null ) {
@@ -146,37 +161,27 @@ public class CCanvas extends KinView {
       }
       if ( ( event.getAction() & MotionEvent.ACTION_MASK ) == MotionEvent.ACTION_POINTER_DOWN ) // 第二點下
         ChangeMode( MODE.SCALE, event );
-      return true;
     } else if ( mTouchMode == MODE.DRAW ) {
       if ( ( event.getAction() & MotionEvent.ACTION_MASK ) == MotionEvent.ACTION_POINTER_DOWN ) // 第二點下
         ChangeMode( MODE.SCALE, event );
       KinPoint screenPoint = new KinPoint( event.getX(), event.getY() );
-      if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
-        if ( !screenPoint.In( mWindowRect ) )
-          return false;
-        int pen = ( (CDrawBoard) GetParent() ).mUISelectPen.GetPen();
-        int color = ( (CDrawBoard) GetParent() ).mUISelectColor.GetColor();
-        int size = ( (CDrawBoard) GetParent() ).mUISelectPen.GetSize();
-        if ( pen == CConstant.PENERASER )
-          color = mBackgroundColor;
-        mNewAction = new Action( 0, mViewRect, pen, color, size );
-        mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
-      }
+
       if ( event.getAction() == MotionEvent.ACTION_MOVE ) {
-        if ( mNewAction == null )
-          return false;
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
       }
       if ( event.getAction() == MotionEvent.ACTION_UP ) {
-        if ( mNewAction == null )
-          return false;
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
-        ( (CDrawBoard) GetParent() ).Submit( mNewAction );
-        mNewAction = null;
+        ChangeMode( MODE.WAIT, event );
       }
-      return true;
+    } else if ( mTouchMode == MODE.WAIT ) {
+      KinPoint screenPoint = new KinPoint( event.getX(), event.getY() );
+      if ( !screenPoint.In( mWindowRect ) )
+        return false;
+      if ( event.getAction() == MotionEvent.ACTION_DOWN )
+        ChangeMode( MODE.DRAW, event );
+
     }
-    return false;
+    return true;
   }
 
   @Override
@@ -185,14 +190,26 @@ public class CCanvas extends KinView {
     int right = (int) ( mViewSize.x * mViewScaleRate + mViewStart.x );
     int bottom = (int) ( mViewSize.y * mViewScaleRate + mViewStart.y );
     mViewRect = new Rect( (int) mViewStart.x, (int) mViewStart.y, right, bottom );
+    List<Action> actions = mProtocal.PullAction();
+    for ( Action a : actions )
+      a.Draw( mCanvas );
     canvas.drawBitmap( mBitmap, mViewRect, mWindowRect, null );
-    if ( mNewAction != null )
-      mNewAction.Draw( canvas, mWindowRect );
+    if ( mNewAction != null ) {
+      mNewAction.Preview( mNewActionCanvas, 1 / mViewScaleRate );
+      canvas.drawBitmap( mNewActionBitmap, mWindowRect.left, mWindowRect.top, null );
+    }
     Paint m = new Paint();
     m.setColor( Color.BLACK );
     m.setStyle( Style.FILL );
     canvas.drawText( "" + pc, 0, 100, m );
 
+  }
+
+  @Override
+  public boolean HasUpdate() {
+    if ( mProtocal.HasNewAction() )
+      return true;
+    return super.HasUpdate();
   }
 
   public void CompatibleWith( double windowWidth, double windowHeight ) {

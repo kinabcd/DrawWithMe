@@ -1,14 +1,9 @@
 package tw.cycuice.drawwithme.ui;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.Main;
 import tw.cycuice.drawwithme.R;
-import tw.cycuice.drawwithme.protocal.Action;
 import tw.cycuice.drawwithme.widget.CCanvas;
 import tw.cycuice.drawwithme.widget.CSelectColor;
 import tw.cycuice.drawwithme.widget.CSelectPen;
@@ -24,7 +19,6 @@ import android.view.KeyEvent;
 public class CDrawBoard extends KinView implements IUI {
 
   // TODO MiniMap
-  List<Action> mActions;
   public CSelectPen mUISelectPen;
   public CSelectColor mUISelectColor;
   CCanvas mUICanvas;
@@ -39,17 +33,12 @@ public class CDrawBoard extends KinView implements IUI {
   @Override
   public void Draw( Canvas canvas ) {
     mHasUpdate = false;
-    while ( !mActions.isEmpty() ) {
-      Action exe = mActions.remove( 0 );
-      mUICanvas.Apply( exe );
-    }
     mTopbarBG.Draw( canvas, 0, 0 );
     super.Draw( canvas );
   }
 
   @Override
   public void LoadContent() {
-    mActions = Collections.synchronizedList( new LinkedList<Action>() );
     mUISelectPen = new CSelectPen();
     mUISelectPen.LoadContent();
     mUISelectColor = new CSelectColor();
@@ -117,18 +106,6 @@ public class CDrawBoard extends KinView implements IUI {
     mUISelectPen.CompatibleWith( windowWidth, windowHeight );
     mUICanvas.CompatibleWith( windowWidth, windowHeight );
     mHasUpdate = true;
-
-  }
-
-  @Override
-  public boolean HasUpdate() {
-    if ( !mActions.isEmpty() )
-      return true;
-    return super.HasUpdate();
-  }
-
-  public void Submit( Action newAction ) {
-    mActions.add( newAction );
 
   }
 

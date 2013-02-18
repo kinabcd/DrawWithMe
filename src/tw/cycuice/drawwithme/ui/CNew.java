@@ -44,7 +44,7 @@ public class CNew extends KinView implements IUI {
     mBackground = new KinImage();
     mBackground.AddImage( R.drawable.menu_bg, -1 );
     mOK = new KinImage();
-    mOK.AddImage( R.drawable.ok, -1 );
+    mOK.AddImage( R.drawable.new_ok, -1 );
     mBOK = new KinButton( mOK );
     mBOK.SetOnClickRun( new Runnable() {
       @Override
@@ -66,7 +66,7 @@ public class CNew extends KinView implements IUI {
       }
     } );
     mReset = new KinImage();
-    mReset.AddImage( R.drawable.reset, -1 );
+    mReset.AddImage( R.drawable.new_reset, -1 );
     mBReset = new KinButton( mReset );
     mBReset.SetOnClickRun( new Runnable() {
       @Override

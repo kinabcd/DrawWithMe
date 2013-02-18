@@ -127,7 +127,7 @@ public class DrawSurface extends SurfaceView implements Callback {
       mBackground.SetSize( mWindowWidth, mWindowHeight );
 
       KinImage mTitle = new KinImage();
-      mTitle.AddImage( R.drawable.title, -1 );
+      mTitle.AddImage( R.drawable.menu_title, -1 );
       mTitle.SetSize( mWindowWidth * 0.95, mWindowHeight * 0.25 );
       if ( sfh != null ) {
         Canvas canvas = sfh.lockCanvas( null );

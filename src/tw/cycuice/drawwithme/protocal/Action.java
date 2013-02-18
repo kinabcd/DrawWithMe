@@ -5,10 +5,12 @@ import java.util.List;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.kin.android.KinPoint;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 
 public class Action {
   int mOpre;
@@ -17,8 +19,9 @@ public class Action {
   int mSize;
   KinPoint mStartPoint;
   List<KinPoint> mPath;
-  Paint mPaint;
   int mLastDrawPointIndex;
+  Bitmap mTempBitmap;
+  Bitmap mTempBitmapNeon;
 
   public Action(int op, Rect view, int pen, int penColor, int penSize) {
     mOpre = op;
@@ -28,15 +31,43 @@ public class Action {
     mPath = new LinkedList<KinPoint>();
     mStartPoint = new KinPoint( view.left, view.top );
     mLastDrawPointIndex = 0;
-    mPaint = new Paint();
-    mPaint.setStyle( Style.FILL );
-    mPaint.setAntiAlias( true );
-    mPaint.setColor( penColor );
-    mPaint.setStrokeWidth( mSize );
+    Paint paint = new Paint();
+    paint.setStyle( Style.FILL );
+    paint.setAntiAlias( false );
+    paint.setColor( penColor );
     if ( pen == CConstant.PENHIGHLIGHTER )
-      mPaint.setAlpha( 12 );
+      paint.setAlpha( 12 );
     if ( pen == CConstant.PENWATERCOLOR )
-      mPaint.setAlpha( 3 );
+      paint.setAlpha( 3 );
+    if ( mPen == CConstant.PENNEON ) {
+      paint.setAlpha( 5 );
+      mTempBitmap = Bitmap.createBitmap( penSize * 3, penSize * 3, Bitmap.Config.ARGB_8888 );
+      Canvas tempCanvas = new Canvas( mTempBitmap );
+      tempCanvas.drawCircle( mSize * 3 / 2, mSize * 3 / 2, mSize * 3 / 2, paint );
+      Paint paintNeon = new Paint();
+      paintNeon.setStyle( Style.FILL );
+      paintNeon.setColor( Color.WHITE );
+      mTempBitmapNeon = Bitmap.createBitmap( penSize, penSize, Bitmap.Config.ARGB_8888 );
+      Canvas tempCanvasNeon = new Canvas( mTempBitmapNeon );
+      tempCanvasNeon.drawCircle( mSize / 2f, mSize / 2f, mSize / 2f, paintNeon );
+    } else {
+      mTempBitmap = Bitmap.createBitmap( penSize, penSize, Bitmap.Config.ARGB_8888 );
+      mTempBitmap.eraseColor( Color.TRANSPARENT );
+      Canvas tempCanvas = new Canvas( mTempBitmap );
+      tempCanvas.drawCircle( mSize / 2f, mSize / 2f, mSize / 2f, paint );
+    }
+  }
+
+  public int GetPen() {
+    return mPen;
+  }
+
+  public int GetColor() {
+    return mColor;
+  }
+
+  public int GetSize() {
+    return mSize;
   }
 
   public void AddPoint( KinPoint p ) {
@@ -47,65 +78,67 @@ public class Action {
   }
 
   public void Draw( Canvas canvas ) {
-    for ( int i = 0; i < mPath.size(); i += 1 ) {
-      if ( i == 0 )
-        DrawPoint( canvas, mStartPoint, mPath.get( i ) );
-      else
-        DrawLine( canvas, mStartPoint, mPath.get( i - 1 ), mPath.get( i ) );
-    }
-  }
+    int last = mLastDrawPointIndex;
 
-  public void Preview( Canvas canvas, double scaleRete ) {
-    KinPoint sp = new KinPoint( 0, 0 );
-    canvas.save();
-    canvas.scale( (float) scaleRete, (float) scaleRete );
-    for ( int i = mLastDrawPointIndex; i < mPath.size(); i += 1 ) {
-      if ( i == 0 )
-        DrawPoint( canvas, sp, mPath.get( i ) );
+    while ( mLastDrawPointIndex < mPath.size() ) {
+      if ( mLastDrawPointIndex == 0 )
+        DrawPoint( canvas, mStartPoint, mPath.get( mLastDrawPointIndex ) );
       else
-        DrawLine( canvas, sp, mPath.get( i - 1 ), mPath.get( i ) );
-      mLastDrawPointIndex = i;
+        DrawLine( canvas, mStartPoint, mPath.get( mLastDrawPointIndex - 1 ), mPath.get( mLastDrawPointIndex ) );
+      mLastDrawPointIndex += 1;
     }
-    canvas.restore();
+    if ( mPen == CConstant.PENNEON ) {
+      int neonStart = last - 1;
+      if ( neonStart < 0 )
+        neonStart = 0;
+      for ( double length = 0; neonStart > 1 && length < mSize; neonStart -= 1 ) {
+        KinPoint p1 = mPath.get( neonStart );
+        KinPoint p2 = mPath.get( neonStart - 1 );
+        length += Math.sqrt( Math.pow( p1.x - p2.x, 2 ) + Math.pow( p1.y - p2.y, 2 ) );
+      }
+      Bitmap sw = mTempBitmap;
+      mTempBitmap = mTempBitmapNeon;
+      for ( int i = neonStart; i < mPath.size(); i += 1 ) {
+        if ( i == 0 )
+          DrawPoint( canvas, mStartPoint, mPath.get( i ) );
+        else
+          DrawLine( canvas, mStartPoint, mPath.get( i - 1 ), mPath.get( i ) );
+      }
+      mTempBitmap = sw;
+    }
   }
 
   void DrawPoint( Canvas canvas, KinPoint startpoint, KinPoint p1 ) {
     float x = (float) ( startpoint.x + p1.x );
     float y = (float) ( startpoint.y + p1.y );
-    canvas.drawCircle( x, y, mSize / 2f, mPaint );
+    canvas.drawBitmap( mTempBitmap, x - mTempBitmap.getWidth() / 2f, y - mTempBitmap.getHeight() / 2f, null );
   }
 
   void DrawLine( Canvas canvas, KinPoint startpoint, KinPoint p1, KinPoint p2 ) {
-    float x1 = (float) ( startpoint.x + p1.x );
-    float y1 = (float) ( startpoint.y + p1.y );
-    float x2 = (float) ( startpoint.x + p2.x );
-    float y2 = (float) ( startpoint.y + p2.y );
-    if ( Math.abs( x1 - x2 ) > Math.abs( y1 - y2 ) ) {
-      if ( x1 > x2 ) {
-        float xtemp = x1;
-        float ytemp = y1;
-        x1 = x2;
-        y1 = y2;
-        x2 = xtemp;
-        y2 = ytemp;
-      }
-      for ( int i = (int) x1; i < x2; i += 1 ) {
+    float x1 = (float) ( p1.x );
+    float y1 = (float) ( p1.y );
+    float x2 = (float) ( p2.x );
+    float y2 = (float) ( p2.y );
+    boolean modX = Math.abs( x1 - x2 ) > Math.abs( y1 - y2 );
+    boolean inc = true;
+    KinPoint drawPoint = new KinPoint();
+    if ( modX ) {
+      inc = x2 > x1;
+      for ( int i = (int) x1; inc && i < x2 || !inc && i > x2; i += inc ? 1 : -1 ) {
         float myY = (float) ( ( i - x1 ) / ( x2 - x1 ) * ( y2 - y1 ) + y1 );
-        canvas.drawCircle( i, myY, mSize / 2f, mPaint );
+        drawPoint.x = i;
+        drawPoint.y = myY;
+        DrawPoint( canvas, startpoint, drawPoint );
       }
     } else {
-      if ( y1 > y2 ) {
-        float xtemp = x1;
-        float ytemp = y1;
-        x1 = x2;
-        y1 = y2;
-        x2 = xtemp;
-        y2 = ytemp;
-      }
-      for ( int i = (int) y1; i < y2; i += 1 ) {
+      inc = y2 > y1;
+      for ( int i = (int) y1; inc && i < y2 || !inc && i > y2; i += inc ? 1 : -1 ) {
         float myX = (float) ( ( i - y1 ) / ( y2 - y1 ) * ( x2 - x1 ) + x1 );
-        canvas.drawCircle( myX, i, mSize / 2f, mPaint );
+        drawPoint.x = myX;
+        drawPoint.y = i;
+        DrawPoint( canvas, startpoint, drawPoint );
       }
+
     }
   }
 }

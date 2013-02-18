@@ -18,7 +18,6 @@ import android.view.KeyEvent;
 
 public class CDrawBoard extends KinView implements IUI {
 
-  // TODO MiniMap
   public CSelectPen mUISelectPen;
   public CSelectColor mUISelectColor;
   CCanvas mUICanvas;
@@ -45,7 +44,7 @@ public class CDrawBoard extends KinView implements IUI {
     mUISelectColor.LoadContent();
     mUICanvas = new CCanvas();
     KinImage imgSetting = new KinImage();
-    imgSetting.AddImage( R.drawable.setting, -1 );
+    imgSetting.AddImage( R.drawable.board_selectpen, -1 );
     mBSetting = new KinButton( imgSetting );
     mBSetting.SetOnClickRun( new Runnable() {
       @Override
@@ -58,7 +57,7 @@ public class CDrawBoard extends KinView implements IUI {
     } );
 
     KinImage imgSelectColor = new KinImage();
-    imgSelectColor.AddImage( R.drawable.select_color, -1 );
+    imgSelectColor.AddImage( R.drawable.board_selectcolor, -1 );
     mBSelectColor = new KinButton( imgSelectColor );
     mBSelectColor.SetOnClickRun( new Runnable() {
       @Override
@@ -71,7 +70,7 @@ public class CDrawBoard extends KinView implements IUI {
     } );
 
     KinImage imgCamera = new KinImage();
-    imgCamera.AddImage( R.drawable.camera, -1 );
+    imgCamera.AddImage( R.drawable.board_camera, -1 );
     mBCamera = new KinButton( imgCamera );
     mBCamera.SetOnClickRun( new Runnable() {
 
@@ -83,7 +82,7 @@ public class CDrawBoard extends KinView implements IUI {
     } );
 
     mTopbarBG = new KinImage();
-    mTopbarBG.AddImage( R.drawable.topbar_bg, -1 );
+    mTopbarBG.AddImage( R.drawable.board_topbar_bg, -1 );
 
     AddChild( mBCamera );
     AddChild( mBSetting );

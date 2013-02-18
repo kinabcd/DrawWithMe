@@ -7,16 +7,17 @@ import tw.kin.android.KinImage;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.util.Log;
 
 public class CMenu extends KinView implements IUI {
   KinImage mBackground;
   KinImage mTitle;
-  KinImage mInternet;
-  KinImage mSingle;
-  KinImage mBluetooth;
-  KinButton mBSingle;
-  KinButton mBInternet;
-  KinButton mBBluetooth;
+  KinButton mBRefresh;
+  KinButton mBSearch;
+  KinButton mBSetting;
+  KinButton mBNew;
+  ScrollView mScroll;
 
   public CMenu() {
     super();
@@ -26,26 +27,39 @@ public class CMenu extends KinView implements IUI {
     mBackground = new KinImage();
     mBackground.AddImage( R.drawable.menu_bg, -1 );
     mTitle = new KinImage();
-    mTitle.AddImage( R.drawable.title, -1 );
+    mTitle.AddImage( R.drawable.menu_title, -1 );
 
-    mInternet = new KinImage();
-    mInternet.AddImage( R.drawable.internet, -1 );
-    mBInternet = new KinButton( mInternet );
-    mSingle = new KinImage();
-    mSingle.AddImage( R.drawable.single, -1 );
-    mBSingle = new KinButton( mSingle );
-    mBSingle.SetOnClickRun( new Runnable() {
+    KinImage iRefresh = new KinImage();
+    iRefresh.AddImage( R.drawable.menu_refresh, -1 );
+    mBRefresh = new KinButton( iRefresh );
+    KinImage iSearch = new KinImage();
+    iSearch.AddImage( R.drawable.menu_search, -1 );
+    mBSearch = new KinButton( iSearch );
+    KinImage iSetting = new KinImage();
+    iSetting.AddImage( R.drawable.menu_setting, -1 );
+    mBSetting = new KinButton( iSetting );
+    mBSetting.SetOnClickRun( new Runnable() {
+      @Override
+      public void run() {
+        // TODO pop setting view
+      }
+    } );
+    KinImage iNew = new KinImage();
+    iNew.AddImage( R.drawable.menu_setting, -1 );
+    mBNew = new KinButton( iNew );
+    mBNew.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
       }
     } );
-    mBluetooth = new KinImage();
-    mBluetooth.AddImage( R.drawable.bluetooth, -1 );
-    mBBluetooth = new KinButton( mBluetooth );
-    AddChild( mBInternet );
-    AddChild( mBSingle );
-    AddChild( mBBluetooth );
+    mScroll = new ScrollView();
+    mScroll.SetBackground( Color.argb( 88, 255, 255, 255 ) );
+    mScroll.AddChild( mBNew );
+    AddChild( mBRefresh );
+    AddChild( mBSearch );
+    AddChild( mBSetting );
+    AddChild( mScroll );
   }
 
   @Override
@@ -64,21 +78,22 @@ public class CMenu extends KinView implements IUI {
     int br = (int) ( windowWidth - bl );
     mBackground.SetSize( windowWidth, windowHeight ); // 設定背景大小
     mTitle.SetSize( windowWidth * 0.95, windowHeight * 0.25 ); // 設定背景大小
-    mBSingle.SetPos( bl, bHeight, br, bHeight * 2 );
-    mBBluetooth.SetPos( bl, bHeight * 2, br, bHeight * 3 );
-    mBInternet.SetPos( bl, bHeight * 3, br, bHeight * 4 );
-
+    mBRefresh.SetPos( bl, (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.25 ), bHeight );
+    mBSearch.SetPos( (int) ( bl + bHeight * 0.35 ), (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.6 ), bHeight );
+    mBSetting.SetPos( (int) ( br - bHeight * 0.25 ), (int) ( windowWidth - br ), br, (int) ( windowWidth - br + bHeight * 0.25 ) );
+    mScroll.SetPos( (int) bl, (int) bHeight, (int) br, (int) ( windowHeight - bl ) );
+    mBNew.SetPos( 0, 0, (int) ( windowWidth * 0.9 ), (int) ( windowWidth * 0.125 ) );
   }
 
   @Override
   public void onStart( IUI from ) {
     mHasUpdate = true;
-    
+
   }
 
   @Override
   public void onQuit( IUI to ) {
-    
+
   }
 
 }

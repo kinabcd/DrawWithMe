@@ -22,27 +22,28 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int black_overlay=0x7f030000;
     }
     public static final class drawable {
-        public static final int bluetooth=0x7f020000;
-        public static final int camera=0x7f020001;
-        public static final int color_fan=0x7f020002;
-        public static final int color_fan_shadow=0x7f020003;
+        public static final int board_camera=0x7f020000;
+        public static final int board_selectcolor=0x7f020001;
+        public static final int board_selectpen=0x7f020002;
+        public static final int board_topbar_bg=0x7f020003;
         public static final int ic_launcher=0x7f020004;
-        public static final int internet=0x7f020005;
-        public static final int menu_bg=0x7f020006;
-        public static final int new_select_bg=0x7f020007;
-        public static final int ok=0x7f020008;
-        public static final int reset=0x7f020009;
-        public static final int select_cancel=0x7f02000a;
-        public static final int select_color=0x7f02000b;
-        public static final int select_eraser=0x7f02000c;
-        public static final int select_highlighter=0x7f02000d;
-        public static final int select_normal=0x7f02000e;
-        public static final int select_onlock=0x7f02000f;
-        public static final int select_watercolor=0x7f020010;
-        public static final int setting=0x7f020011;
-        public static final int single=0x7f020012;
-        public static final int title=0x7f020013;
-        public static final int topbar_bg=0x7f020014;
+        public static final int menu_bg=0x7f020005;
+        public static final int menu_refresh=0x7f020006;
+        public static final int menu_search=0x7f020007;
+        public static final int menu_setting=0x7f020008;
+        public static final int menu_title=0x7f020009;
+        public static final int new_ok=0x7f02000a;
+        public static final int new_reset=0x7f02000b;
+        public static final int new_select_bg=0x7f02000c;
+        public static final int selectcolor_fan=0x7f02000d;
+        public static final int selectcolor_fan_shadow=0x7f02000e;
+        public static final int selectpen_cancel=0x7f02000f;
+        public static final int selectpen_eraser=0x7f020010;
+        public static final int selectpen_highlighter=0x7f020011;
+        public static final int selectpen_lock=0x7f020012;
+        public static final int selectpen_neon=0x7f020013;
+        public static final int selectpen_normal=0x7f020014;
+        public static final int selectpen_watercolor=0x7f020015;
     }
     public static final class string {
         public static final int app_name=0x7f040000;

@@ -36,7 +36,7 @@ public class CSelectPen extends KinView {
   public void LoadContent() {
     mBackground = new KinImage();
     mCancel = new KinImage();
-    mCancel.AddImage( R.drawable.select_cancel, -1 );
+    mCancel.AddImage( R.drawable.selectpen_cancel, -1 );
     mBCancel = new KinButton( mCancel );
     mBCancel.SetOnClickRun( new Runnable() {
       @Override
@@ -49,12 +49,12 @@ public class CSelectPen extends KinView {
     for ( int i = 0; i < 6; i += 1 )
       mPenType[i] = new KinImage();
 
-    mPenType[0].AddImage( R.drawable.select_normal, -1 );
-    mPenType[1].AddImage( R.drawable.select_eraser, -1 );
-    mPenType[2].AddImage( R.drawable.select_highlighter, -1 );
-    mPenType[3].AddImage( R.drawable.select_watercolor, -1 );
-    mPenType[4].AddImage( R.drawable.select_cancel, -1 );
-    mPenType[5].AddImage( R.drawable.select_onlock, -1 );
+    mPenType[0].AddImage( R.drawable.selectpen_normal, -1 );
+    mPenType[1].AddImage( R.drawable.selectpen_eraser, -1 );
+    mPenType[2].AddImage( R.drawable.selectpen_highlighter, -1 );
+    mPenType[3].AddImage( R.drawable.selectpen_watercolor, -1 );
+    mPenType[4].AddImage( R.drawable.selectpen_neon, -1 );
+    mPenType[5].AddImage( R.drawable.selectpen_lock, -1 );
 
     mB_Normal = new KinButton( mPenType[0] ); // 一般畫筆
     mB_Normal.SetOnClickRun( new Runnable() {
@@ -183,8 +183,8 @@ public class CSelectPen extends KinView {
   }
 
   public int GetSize() {
-    if ( mSize < 1 )
-      return 1;
+    if ( mSize < 2 )
+      return 2;
     return mSize;
   }
 

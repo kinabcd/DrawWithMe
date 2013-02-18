@@ -9,7 +9,7 @@ import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.protocal.Action;
 import tw.cycuice.drawwithme.protocal.CModeSingle;
-import tw.cycuice.drawwithme.protocal.IModeProtocal;
+import tw.cycuice.drawwithme.protocal.IActionCotroller;
 import tw.cycuice.drawwithme.ui.CDrawBoard;
 import tw.kin.android.KinPoint;
 import tw.kin.android.KinView;
@@ -28,14 +28,12 @@ public class CCanvas extends KinView {
     WAIT, DRAW, MOVE, SCALE
   };
 
-  IModeProtocal mProtocal;
+  IActionCotroller mProtocal;
   Bitmap mBitmap;
   Canvas mCanvas;
   Rect mWindowRect; // 螢幕上顯示的範圍
   int mBackgroundColor;
   Action mNewAction;
-  Bitmap mNewActionBitmap; // 大小與螢幕顯示範圍相同
-  Canvas mNewActionCanvas;
   String pc;
   KinPoint mDownCenterPoint;
   double mDownLength;
@@ -45,6 +43,7 @@ public class CCanvas extends KinView {
   KinPoint mViewSize;
   Rect mViewRect; // 畫布要轉畫到螢幕的範圍
   MODE mTouchMode;
+  int mPointCount;
 
   public CCanvas() {
   }
@@ -57,9 +56,6 @@ public class CCanvas extends KinView {
     mViewStart = new KinPoint( 0, 0 );
     mViewScaleRate = 1;
     mViewSize = new KinPoint( mWindowRect.right - mWindowRect.left, mWindowRect.bottom - mWindowRect.top );
-    mNewActionBitmap = Bitmap.createBitmap( (int) mViewSize.x, (int) mViewSize.y, Bitmap.Config.ARGB_8888 );
-    mNewActionCanvas = new Canvas( mNewActionBitmap );
-
     mProtocal = new CModeSingle();
     mTouchMode = MODE.WAIT;
   }
@@ -82,9 +78,9 @@ public class CCanvas extends KinView {
       int size = ( (CDrawBoard) GetParent() ).mUISelectPen.GetSize();
       if ( pen == CConstant.PENERASER )
         color = mBackgroundColor;
-      mNewActionBitmap.eraseColor( Color.TRANSPARENT );
       mNewAction = new Action( 0, mViewRect, pen, color, size );
       mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
+      mPointCount = 0;
       mTouchMode = MODE.DRAW;
     } else if ( mode == MODE.WAIT ) {
       if ( mNewAction != null ) {
@@ -168,6 +164,9 @@ public class CCanvas extends KinView {
 
       if ( event.getAction() == MotionEvent.ACTION_MOVE ) {
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
+        mPointCount += 1;
+        if ( mPointCount > 5 )
+          mProtocal.PushAction( mNewAction );
       }
       if ( event.getAction() == MotionEvent.ACTION_UP ) {
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
@@ -194,10 +193,6 @@ public class CCanvas extends KinView {
     for ( Action a : actions )
       a.Draw( mCanvas );
     canvas.drawBitmap( mBitmap, mViewRect, mWindowRect, null );
-    if ( mNewAction != null ) {
-      mNewAction.Preview( mNewActionCanvas, 1 / mViewScaleRate );
-      canvas.drawBitmap( mNewActionBitmap, mWindowRect.left, mWindowRect.top, null );
-    }
     Paint m = new Paint();
     m.setColor( Color.BLACK );
     m.setStyle( Style.FILL );

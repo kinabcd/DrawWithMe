@@ -55,19 +55,19 @@ public class CSelectColor extends KinView {
     mBaseColor = new int[8];
     mSelectors = new KinImage[8];
     mShadow = new KinImage();
-    mShadow.AddImage( R.drawable.color_fan_shadow, -1 );
+    mShadow.AddImage( R.drawable.selectcolor_fan_shadow, -1 );
     for ( int i = 0; i < 8; i += 1 ) {
       mSelectors[i] = new KinImage();
-      mSelectors[i].AddImage( R.drawable.color_fan, -1 );
+      mSelectors[i].AddImage( R.drawable.selectcolor_fan, -1 );
     }
-    SetSelectorColor( 0, 0xff0000 );
-    SetSelectorColor( 1, 0xffff00 );
-    SetSelectorColor( 2, 0xffffff );
-    SetSelectorColor( 3, 0x00ff00 );
-    SetSelectorColor( 4, 0x00ffff );
-    SetSelectorColor( 5, 0x0000ff );
-    SetSelectorColor( 6, 0x000000 );
-    SetSelectorColor( 7, 0xff00ff );
+    SetSelectorColor( 0, 0xffff0000 );
+    SetSelectorColor( 1, 0xffffff00 );
+    SetSelectorColor( 2, 0xffffffff );
+    SetSelectorColor( 3, 0xff00ff00 );
+    SetSelectorColor( 4, 0xff00ffff );
+    SetSelectorColor( 5, 0xff0000ff );
+    SetSelectorColor( 6, 0xff000000 );
+    SetSelectorColor( 7, 0xffff00ff );
   }
 
   public int GetColor() {

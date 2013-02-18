@@ -1,8 +1,8 @@
 package tw.cycuice.drawwithme.widget;
 
 import tw.cycuice.drawwithme.R;
-import tw.kin.android.KinImage;
 import tw.kin.android.KinView;
+import tw.kin.android.widget.KinImage;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
@@ -42,11 +42,13 @@ public class CSelectColor extends KinView {
       canvas.save();
       canvas.translate( 3, 3 );
       canvas.rotate( 45 * i, mCenterX, mCenterY );
-      mShadow.Draw( canvas, mCenterX - mShadow.GetWidth() / 2, mCenterY - mOutR );
+      mShadow.SetPos( mCenterX - mShadow.GetWidth() / 2, mCenterY - mOutR );
+      mShadow.Draw( canvas );
       canvas.restore();
     }
     for ( int i = 0; i < 8; i += 1 ) {
-      mSelectors[i].Draw( canvas, mCenterX - mSelectors[i].GetWidth() / 2, mCenterY - mOutR );
+      mSelectors[i].SetPos( mCenterX - mSelectors[i].GetWidth() / 2, mCenterY - mOutR );
+      mSelectors[i].Draw( canvas );
       canvas.rotate( 45, mCenterX, mCenterY );
     }
   }

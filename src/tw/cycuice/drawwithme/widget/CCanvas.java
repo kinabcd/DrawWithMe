@@ -210,6 +210,7 @@ public class CCanvas extends KinView {
   public void CompatibleWith( double windowWidth, double windowHeight ) {
     int myY = (int) ( windowHeight * ( windowHeight * ( -1 / 28800.0 ) + ( 1 / 9.0 ) ) );
     mWindowRect = new Rect( 0, myY, (int) windowWidth, (int) windowHeight );
+    SetPos( mWindowRect );
     mHasUpdate = true;
   }
 

@@ -2,10 +2,10 @@ package tw.cycuice.drawwithme.widget;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.R;
-import tw.kin.android.KinImage;
 import tw.kin.android.KinPoint;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
+import tw.kin.android.widget.KinImage;
 import tw.kin.android.widget.KinSeekBar;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -157,6 +157,7 @@ public class CSelectPen extends KinView {
   }
 
   public void CompatibleWith( double windowWidth, double windowHeight ) {
+    SetAlignment( Alignment.FILL, Alignment.FILL );
     mHasUpdate = true;
     mBackground.SetSize( windowWidth, windowHeight ); // 設定背景大小
     mBCancel.SetPos( (int) ( windowWidth * 0.25 ), (int) ( windowHeight - ( windowWidth * 0.25 ) ), (int) ( windowWidth * 0.75 ), (int) windowHeight );

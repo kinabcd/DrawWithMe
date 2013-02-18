@@ -40,10 +40,11 @@ public class Action {
     if ( pen == CConstant.PENWATERCOLOR )
       paint.setAlpha( 3 );
     if ( mPen == CConstant.PENNEON ) {
-      paint.setAlpha( 5 );
+      paint.setAlpha( 6 );
       mTempBitmap = Bitmap.createBitmap( penSize * 3, penSize * 3, Bitmap.Config.ARGB_8888 );
       Canvas tempCanvas = new Canvas( mTempBitmap );
-      tempCanvas.drawCircle( mSize * 3 / 2, mSize * 3 / 2, mSize * 3 / 2, paint );
+      // float iSizeRate = (float)(-0.05*mSize+3.15) ; // by black
+      tempCanvas.drawCircle( mSize * 3 / 2, mSize * 3 / 2, mSize * 3 / 2, paint ); 
       Paint paintNeon = new Paint();
       paintNeon.setStyle( Style.FILL );
       paintNeon.setColor( Color.WHITE );

@@ -3,12 +3,10 @@ package tw.cycuice.drawwithme.ui;
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.R;
-import tw.kin.android.KinImage;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
-import android.graphics.Canvas;
+import tw.kin.android.widget.KinImage;
 import android.graphics.Color;
-import android.util.Log;
 
 public class CMenu extends KinView implements IUI {
   KinImage mBackground;
@@ -16,7 +14,7 @@ public class CMenu extends KinView implements IUI {
   KinButton mBRefresh;
   KinButton mBSearch;
   KinButton mBSetting;
-  KinButton mBNew;
+  KinButton mBCreate;
   ScrollView mScroll;
 
   public CMenu() {
@@ -26,15 +24,30 @@ public class CMenu extends KinView implements IUI {
   public void LoadContent() {
     mBackground = new KinImage();
     mBackground.AddImage( R.drawable.menu_bg, -1 );
+    mBackground.SetAlignment( Alignment.FILL, Alignment.FILL );
     mTitle = new KinImage();
     mTitle.AddImage( R.drawable.menu_title, -1 );
+    mTitle.SetSizePercent( 0.95, 0.25 ); // 設定標題大小(百分比)
+    mTitle.SetAlignment( Alignment.CENTER, Alignment.TOP );
 
     KinImage iRefresh = new KinImage();
     iRefresh.AddImage( R.drawable.menu_refresh, -1 );
     mBRefresh = new KinButton( iRefresh );
+    mBRefresh.SetOnClickRun( new Runnable() {
+      @Override
+      public void run() {
+        // TODO refresh menu
+      }
+    } );
     KinImage iSearch = new KinImage();
     iSearch.AddImage( R.drawable.menu_search, -1 );
     mBSearch = new KinButton( iSearch );
+    mBSearch.SetOnClickRun( new Runnable() {
+      @Override
+      public void run() {
+        // TODO pop searching view
+      }
+    } );
     KinImage iSetting = new KinImage();
     iSetting.AddImage( R.drawable.menu_setting, -1 );
     mBSetting = new KinButton( iSetting );
@@ -45,9 +58,11 @@ public class CMenu extends KinView implements IUI {
       }
     } );
     KinImage iNew = new KinImage();
-    iNew.AddImage( R.drawable.menu_setting, -1 );
-    mBNew = new KinButton( iNew );
-    mBNew.SetOnClickRun( new Runnable() {
+    iNew.AddImage( R.drawable.menu_create, -1 );
+    mBCreate = new KinButton( iNew );
+    mBCreate.SetAlignment( Alignment.LEFT, Alignment.TOP );
+    mBCreate.SetSizePercent( 0.5, 0.125 ); // 設定Create大小(百分比)
+    mBCreate.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
@@ -55,7 +70,9 @@ public class CMenu extends KinView implements IUI {
     } );
     mScroll = new ScrollView();
     mScroll.SetBackground( Color.argb( 88, 255, 255, 255 ) );
-    mScroll.AddChild( mBNew );
+    mScroll.AddChild( mBCreate );
+    AddChild( mBackground );
+    AddChild( mTitle );
     AddChild( mBRefresh );
     AddChild( mBSearch );
     AddChild( mBSetting );
@@ -63,32 +80,21 @@ public class CMenu extends KinView implements IUI {
   }
 
   @Override
-  public void Draw( Canvas canvas ) {
-    mBackground.Draw( canvas, 0, 0 );
-    mTitle.Draw( canvas, 0, 0 );
-    super.Draw( canvas );
-
-  }
-
-  @Override
   public void CompatibleWith( double windowWidth, double windowHeight ) {
+    SetPos( 0, 0, (int) windowWidth, (int) windowHeight );
     int bHeight = (int) ( windowHeight * 0.25 );
     int bWidth = (int) ( bHeight / 300.0 * 680.0 );
     int bl = (int) ( ( windowWidth - bWidth ) / 2 );
     int br = (int) ( windowWidth - bl );
-    mBackground.SetSize( windowWidth, windowHeight ); // 設定背景大小
-    mTitle.SetSize( windowWidth * 0.95, windowHeight * 0.25 ); // 設定背景大小
     mBRefresh.SetPos( bl, (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.25 ), bHeight );
     mBSearch.SetPos( (int) ( bl + bHeight * 0.35 ), (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.6 ), bHeight );
     mBSetting.SetPos( (int) ( br - bHeight * 0.25 ), (int) ( windowWidth - br ), br, (int) ( windowWidth - br + bHeight * 0.25 ) );
     mScroll.SetPos( (int) bl, (int) bHeight, (int) br, (int) ( windowHeight - bl ) );
-    mBNew.SetPos( 0, 0, (int) ( windowWidth * 0.9 ), (int) ( windowWidth * 0.125 ) );
   }
 
   @Override
   public void onStart( IUI from ) {
     mHasUpdate = true;
-
   }
 
   @Override

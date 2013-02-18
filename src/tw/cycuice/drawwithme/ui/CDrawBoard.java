@@ -7,12 +7,11 @@ import tw.cycuice.drawwithme.R;
 import tw.cycuice.drawwithme.widget.CCanvas;
 import tw.cycuice.drawwithme.widget.CSelectColor;
 import tw.cycuice.drawwithme.widget.CSelectPen;
-import tw.kin.android.KinImage;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
+import tw.kin.android.widget.KinImage;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.KeyEvent;
 
@@ -27,13 +26,6 @@ public class CDrawBoard extends KinView implements IUI {
   KinImage mTopbarBG;
 
   public CDrawBoard() {
-  }
-
-  @Override
-  public void Draw( Canvas canvas ) {
-    mHasUpdate = false;
-    mTopbarBG.Draw( canvas, 0, 0 );
-    super.Draw( canvas );
   }
 
   @Override
@@ -83,7 +75,9 @@ public class CDrawBoard extends KinView implements IUI {
 
     mTopbarBG = new KinImage();
     mTopbarBG.AddImage( R.drawable.board_topbar_bg, -1 );
+    mTopbarBG.SetAlignment( Alignment.FILL, Alignment.TOP );
 
+    AddChild( mTopbarBG );
     AddChild( mBCamera );
     AddChild( mBSetting );
     AddChild( mBSelectColor );
@@ -96,11 +90,12 @@ public class CDrawBoard extends KinView implements IUI {
 
   @Override
   public void CompatibleWith( double windowWidth, double windowHeight ) {
+    SetPos( 0, 0, (int) windowWidth, (int) windowHeight );
     int bSize = (int) ( windowHeight * ( windowHeight * ( -1 / 28800.0 ) + ( 1 / 9.0 ) ) );
     mBSetting.SetPos( 0, 0, bSize, bSize );
     mBSelectColor.SetPos( bSize, 0, bSize * 2, bSize );
     mBCamera.SetPos( bSize * 2, 0, bSize * 3, bSize );
-    mTopbarBG.SetSize( windowWidth, bSize );
+    mTopbarBG.SetSize( (int) windowWidth, bSize );
     mUISelectColor.CompatibleWith( windowWidth, windowHeight );
     mUISelectPen.CompatibleWith( windowWidth, windowHeight );
     mUICanvas.CompatibleWith( windowWidth, windowHeight );

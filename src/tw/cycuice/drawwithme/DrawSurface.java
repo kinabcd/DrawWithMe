@@ -4,7 +4,7 @@ import tw.cycuice.drawwithme.ui.CDrawBoard;
 import tw.cycuice.drawwithme.ui.CMenu;
 import tw.cycuice.drawwithme.ui.CNew;
 import tw.cycuice.drawwithme.ui.IUI;
-import tw.kin.android.KinImage;
+import tw.kin.android.widget.KinImage;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -124,16 +124,17 @@ public class DrawSurface extends SurfaceView implements Callback {
 
       KinImage mBackground = new KinImage();
       mBackground.AddImage( R.drawable.menu_bg, -1 );
-      mBackground.SetSize( mWindowWidth, mWindowHeight );
+      mBackground.SetPos( 0, 0, mWindowWidth, mWindowHeight );
 
       KinImage mTitle = new KinImage();
       mTitle.AddImage( R.drawable.menu_title, -1 );
       mTitle.SetSize( mWindowWidth * 0.95, mWindowHeight * 0.25 );
+      mTitle.SetPos( ( mWindowWidth - mTitle.GetWidth() ) / 2, ( mWindowHeight - mTitle.GetHeight() ) / 2 );
       if ( sfh != null ) {
         Canvas canvas = sfh.lockCanvas( null );
         if ( canvas != null ) {
-          mBackground.Draw( canvas, 0, 0 );
-          mTitle.Draw( canvas, ( mWindowWidth - mTitle.GetWidth() ) / 2, ( mWindowHeight - mTitle.GetHeight() ) / 2 );
+          mBackground.Draw( canvas );
+          mTitle.Draw( canvas );
           sfh.unlockCanvasAndPost( canvas );// 更新螢幕顯示
         }
       }

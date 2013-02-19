@@ -72,6 +72,7 @@ public class CMenu extends KinView implements IUI {
     mScroll = new KinScroll();
     mScroll.SetBackground( Color.argb( 88, 255, 255, 255 ) );
     mScroll.GetLayout().AddChild( mBCreate );
+    mScroll.SetAlignment( Alignment.DEPENDENT_PARENT, Alignment.DEPENDENT_PARENT );
     AddChild( mBackground );
     AddChild( mTitle );
     AddChild( mBRefresh );

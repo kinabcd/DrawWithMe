@@ -20,9 +20,10 @@ public class CDrawBoard extends KinView implements IUI {
   public CSelectPen mUISelectPen;
   public CSelectColor mUISelectColor;
   CCanvas mUICanvas;
-  KinButton mBSetting;
+  KinButton mBSelectPen;
   KinButton mBSelectColor;
   KinButton mBCamera;
+  KinButton mBSetting;
   KinImage mTopbarBG;
 
   public CDrawBoard() {
@@ -33,10 +34,10 @@ public class CDrawBoard extends KinView implements IUI {
     mUISelectPen = new CSelectPen();
     mUISelectColor = new CSelectColor();
     mUICanvas = new CCanvas();
-    KinImage imgSetting = new KinImage();
-    imgSetting.AddImage( R.drawable.board_selectpen, -1 );
-    mBSetting = new KinButton( imgSetting );
-    mBSetting.SetOnClickRun( new Runnable() {
+    KinImage imgSelectPen = new KinImage();
+    imgSelectPen.AddImage( R.drawable.board_selectpen, -1 );
+    mBSelectPen = new KinButton( imgSelectPen );
+    mBSelectPen.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
         if ( mUISelectPen.IsVisible() )
@@ -71,13 +72,23 @@ public class CDrawBoard extends KinView implements IUI {
 
     } );
 
+    KinImage imgSetting = new KinImage();
+    imgSetting.AddImage( R.drawable.board_setting, -1 );
+    mBSetting = new KinButton( imgSetting );
+    mBSetting.SetOnClickRun( new Runnable() {
+
+      @Override
+      public void run() {
+      }
+    } );
     mTopbarBG = new KinImage();
     mTopbarBG.AddImage( R.drawable.board_topbar_bg, -1 );
     mTopbarBG.SetAlignment( Alignment.FILL, Alignment.TOP );
 
     AddChild( mTopbarBG );
-    AddChild( mBCamera );
     AddChild( mBSetting );
+    AddChild( mBCamera );
+    AddChild( mBSelectPen );
     AddChild( mBSelectColor );
     AddChild( mUICanvas );
     AddChild( mUISelectPen );
@@ -90,9 +101,10 @@ public class CDrawBoard extends KinView implements IUI {
   public void CompatibleWith( double windowWidth, double windowHeight ) {
     SetPos( 0, 0, (int) windowWidth, (int) windowHeight );
     int bSize = (int) ( windowHeight * ( windowHeight * ( -1 / 28800.0 ) + ( 1 / 9.0 ) ) );
-    mBSetting.SetPos( 0, 0, bSize, bSize );
+    mBSelectPen.SetPos( 0, 0, bSize, bSize );
     mBSelectColor.SetPos( bSize, 0, bSize * 2, bSize );
     mBCamera.SetPos( bSize * 2, 0, bSize * 3, bSize );
+    mBSetting.SetPos( bSize * 3, 0, bSize * 4, bSize );
     mTopbarBG.SetSize( (int) windowWidth, bSize );
     mUISelectColor.CompatibleWith( windowWidth, windowHeight );
     mUISelectPen.CompatibleWith( windowWidth, windowHeight );
@@ -139,6 +151,7 @@ public class CDrawBoard extends KinView implements IUI {
       } );
       ad.setCancelable( true );
       ad.show();
+      return true;
     }
     return false;
 

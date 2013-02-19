@@ -8,6 +8,7 @@ public class CConstant {
   public final static int PAGEMENU = 1;
   public final static int PAGECANVAS = 2;
   public final static int PAGENEW = 3;
+  public final static int PAGEMEMBER = 4;
   
   public final static int PENNORMAL = 0;
   public final static int PENERASER = 1;

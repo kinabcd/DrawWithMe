@@ -1,6 +1,7 @@
 package tw.cycuice.drawwithme;
 
 import tw.cycuice.drawwithme.ui.CDrawBoard;
+import tw.cycuice.drawwithme.ui.CMemberCenter;
 import tw.cycuice.drawwithme.ui.CMenu;
 import tw.cycuice.drawwithme.ui.CNew;
 import tw.cycuice.drawwithme.ui.IUI;
@@ -26,6 +27,7 @@ public class DrawSurface extends SurfaceView implements Callback {
   int ViewHeight;
   SurfaceHolder sfh;
   IUI mUIs;
+  CMemberCenter mUIMemberCenter;
   CDrawBoard mUICanvas;
   CMenu mUIMenu;
   CNew mUINew;
@@ -59,6 +61,8 @@ public class DrawSurface extends SurfaceView implements Callback {
       mUIs = mUINew;
     } else if ( mPageStatus == CConstant.PAGECANVAS ) {
       mUIs = mUICanvas;
+    } else if ( mPageStatus == CConstant.PAGEMEMBER ) {
+      mUIs = mUIMemberCenter;
     }
     if ( oldui != null )
       oldui.onQuit( mUIs );
@@ -92,13 +96,9 @@ public class DrawSurface extends SurfaceView implements Callback {
   }
 
   public boolean onKeyDown( int keycode, KeyEvent event ) {
-    if ( mPageStatus == CConstant.PAGECANVAS ) {
-      if ( mUICanvas.onKeyDown( keycode, event ) )
-        return true;
-    } else if ( mPageStatus == CConstant.PAGENEW ) {
-      if ( mUINew.onKeyDown( keycode, event ) )
-        return true;
-    } else {
+    if ( mUIs.onKeyDown( keycode, event ) )
+      return true;
+    else {
       if ( keycode == KeyEvent.KEYCODE_BACK ) {
         Main.sInstance.finish();
         return true;
@@ -141,9 +141,11 @@ public class DrawSurface extends SurfaceView implements Callback {
       mUIMenu = new CMenu();
       mUINew = new CNew();
       mUICanvas = new CDrawBoard();
+      mUIMemberCenter = new CMemberCenter();
       mUIMenu.LoadContent();
       mUINew.LoadContent();
       mUICanvas.LoadContent();
+      mUIMemberCenter.LoadContent();
       Resize( mWindowWidth, mWindowHeight );
       SetPage( CConstant.PAGEMENU );
       LoadContent = null; // 讀取後自動銷毀
@@ -154,6 +156,7 @@ public class DrawSurface extends SurfaceView implements Callback {
     mUIMenu.CompatibleWith( windowWidth, windowHeight );
     mUINew.CompatibleWith( windowWidth, windowHeight );
     mUICanvas.CompatibleWith( windowWidth, windowHeight );
+    mUIMemberCenter.CompatibleWith( windowWidth, windowHeight );
 
   }
 

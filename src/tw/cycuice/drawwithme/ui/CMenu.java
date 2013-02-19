@@ -2,12 +2,23 @@ package tw.cycuice.drawwithme.ui;
 
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
+import tw.cycuice.drawwithme.Main;
 import tw.cycuice.drawwithme.R;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
 import tw.kin.android.widget.KinScroll;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.InputType;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class CMenu extends KinView implements IUI {
   KinImage mBackground;
@@ -16,6 +27,7 @@ public class CMenu extends KinView implements IUI {
   KinButton mBSearch;
   KinButton mBSetting;
   KinButton mBCreate;
+  KinButton mBLogin;
   KinScroll mScroll;
 
   public CMenu() {
@@ -46,7 +58,32 @@ public class CMenu extends KinView implements IUI {
     mBSearch.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
-        // TODO pop searching view
+        AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
+        builder.setTitle( "Search" );
+        final LinearLayout view = new LinearLayout( Main.sInstance );
+        view.setOrientation( LinearLayout.VERTICAL );
+        final EditText inputKeyword = new EditText( Main.sInstance );
+        inputKeyword.setHint( "Keyword..." );
+        inputKeyword.setInputType( InputType.TYPE_CLASS_TEXT );
+        inputKeyword.setTypeface( Typeface.SERIF );
+        final LinearLayout checkLayout = new LinearLayout( Main.sInstance );
+        final CheckBox checkNo = new CheckBox( Main.sInstance );
+        checkNo.setChecked( true );
+        checkNo.setText( "No." );
+        final CheckBox checkName = new CheckBox( Main.sInstance );
+        checkName.setChecked( true );
+        checkName.setText( "Name" );
+        checkLayout.addView( checkNo );
+        checkLayout.addView( checkName );
+        view.addView( inputKeyword );
+        view.addView( checkLayout );
+        builder.setView( view );
+        builder.setPositiveButton( "Search", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick( DialogInterface dialog, int which ) {
+          }
+        } );
+        builder.show();
       }
     } );
     KinImage iSetting = new KinImage();
@@ -55,12 +92,12 @@ public class CMenu extends KinView implements IUI {
     mBSetting.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
-        // TODO pop setting view
+        DrawSurface.GetInstance().SetPage( CConstant.PAGEMEMBER );
       }
     } );
-    KinImage iNew = new KinImage();
-    iNew.AddImage( R.drawable.menu_create, -1 );
-    mBCreate = new KinButton( iNew );
+    KinImage iCreate = new KinImage();
+    iCreate.AddImage( R.drawable.menu_create, -1 );
+    mBCreate = new KinButton( iCreate );
     mBCreate.SetAlignment( Alignment.LEFT, Alignment.TOP );
     mBCreate.SetSizePercent( 0.5, 0.125 ); // 設定Create大小(百分比)
     mBCreate.SetOnClickRun( new Runnable() {
@@ -69,10 +106,59 @@ public class CMenu extends KinView implements IUI {
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
       }
     } );
+    KinImage iLogin = new KinImage();
+    iLogin.AddImage( R.drawable.menu_login, -1 );
+    mBLogin = new KinButton( iLogin );
+    mBLogin.SetAlignment( Alignment.RIGHT, Alignment.TOP );
+    mBLogin.SetSizePercent( 0.5, 0.125 ); // 設定Create大小(百分比)
+    mBLogin.SetOnClickRun( new Runnable() {
+      @Override
+      public void run() {
+        AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
+        builder.setTitle( "Login" );
+        final LinearLayout view = new LinearLayout( Main.sInstance );
+        view.setOrientation( LinearLayout.VERTICAL );
+        final EditText inputAccount = new EditText( Main.sInstance );
+        inputAccount.setHint( "Account..." );
+        inputAccount.setInputType( InputType.TYPE_CLASS_TEXT );
+        inputAccount.setTypeface( Typeface.SERIF );
+        final EditText inputPasswd = new EditText( Main.sInstance );
+        inputPasswd.setHint( "Password..." );
+        inputPasswd.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
+        inputPasswd.setTypeface( Typeface.SERIF );
+
+        view.addView( inputAccount );
+        view.addView( inputPasswd );
+        builder.setView( view );
+        builder.setPositiveButton( "Login", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick( DialogInterface dialog, int which ) {
+            Toast.makeText( Main.sInstance, "Login Failed!!", Toast.LENGTH_LONG ).show();
+          }
+        } );
+        builder.setNeutralButton( "Register", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick( DialogInterface dialog, int which ) {
+            LayoutInflater inflater = LayoutInflater.from( Main.sInstance );
+            View register = inflater.inflate( R.layout.register, null );
+            AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
+            builder.setTitle( "Register" );
+            builder.setView( register );
+            builder.setPositiveButton( "Register", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick( DialogInterface dialog, int which ) {
+              }
+            } );
+            builder.show();
+          }
+        } );
+        builder.show();
+      }
+    } );
     mScroll = new KinScroll();
     mScroll.SetBackground( Color.argb( 88, 255, 255, 255 ) );
     mScroll.GetLayout().AddChild( mBCreate );
-    mScroll.SetAlignment( Alignment.DEPENDENT_PARENT, Alignment.DEPENDENT_PARENT );
+    mScroll.GetLayout().AddChild( mBLogin );
     AddChild( mBackground );
     AddChild( mTitle );
     AddChild( mBRefresh );
@@ -96,6 +182,7 @@ public class CMenu extends KinView implements IUI {
 
   @Override
   public void onStart( IUI from ) {
+    mScroll.SetScroll( 0 );
     mHasUpdate = true;
   }
 

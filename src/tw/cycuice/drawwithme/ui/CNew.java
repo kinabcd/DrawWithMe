@@ -108,7 +108,7 @@ public class CNew extends KinView implements IUI {
     mUISelectSize.SetSeekValueY( mSizeBarY.GetSeekValue() );
     mUISelectSize.SetColor( mUISelectColor.GetColor() );
     super.Draw( canvas );
-    canvas.drawText( height + " x " + width, mViewPos.left, mViewPos.top - 3, mTextPaint );
+    canvas.drawText( height + " x " + width, mUISelectSize.GetX(), mUISelectSize.GetY() - 3, mTextPaint );
   }
 
   @Override

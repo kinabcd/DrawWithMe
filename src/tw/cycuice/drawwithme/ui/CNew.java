@@ -83,7 +83,6 @@ public class CNew extends KinView implements IUI {
     mSizeBarY.SetMaxValue( CConstant.MaxHeight );
     mUISelectSize = new CSelectSize();
     mUISelectColor = new CSelectColor();
-    mUISelectColor.LoadContent();
     mTextPaint = new Paint();
     mTextPaint.setStyle( Style.FILL_AND_STROKE );
     mTextPaint.setTextSize( 20 );

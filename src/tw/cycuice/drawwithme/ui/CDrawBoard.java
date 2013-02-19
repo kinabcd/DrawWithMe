@@ -31,9 +31,7 @@ public class CDrawBoard extends KinView implements IUI {
   @Override
   public void LoadContent() {
     mUISelectPen = new CSelectPen();
-    mUISelectPen.LoadContent();
     mUISelectColor = new CSelectColor();
-    mUISelectColor.LoadContent();
     mUICanvas = new CCanvas();
     KinImage imgSetting = new KinImage();
     imgSetting.AddImage( R.drawable.board_selectpen, -1 );

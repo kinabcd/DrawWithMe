@@ -53,7 +53,7 @@ public class CSelectColor extends KinView {
     }
   }
 
-  public void LoadContent() {
+  public CSelectColor() {
     mBaseColor = new int[8];
     mSelectors = new KinImage[8];
     mShadow = new KinImage();

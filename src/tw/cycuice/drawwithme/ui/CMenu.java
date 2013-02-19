@@ -6,6 +6,7 @@ import tw.cycuice.drawwithme.R;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
+import tw.kin.android.widget.KinScroll;
 import android.graphics.Color;
 
 public class CMenu extends KinView implements IUI {
@@ -15,7 +16,7 @@ public class CMenu extends KinView implements IUI {
   KinButton mBSearch;
   KinButton mBSetting;
   KinButton mBCreate;
-  ScrollView mScroll;
+  KinScroll mScroll;
 
   public CMenu() {
     super();
@@ -68,9 +69,9 @@ public class CMenu extends KinView implements IUI {
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
       }
     } );
-    mScroll = new ScrollView();
+    mScroll = new KinScroll();
     mScroll.SetBackground( Color.argb( 88, 255, 255, 255 ) );
-    mScroll.AddChild( mBCreate );
+    mScroll.GetLayout().AddChild( mBCreate );
     AddChild( mBackground );
     AddChild( mTitle );
     AddChild( mBRefresh );
@@ -86,8 +87,8 @@ public class CMenu extends KinView implements IUI {
     int bWidth = (int) ( bHeight / 300.0 * 680.0 );
     int bl = (int) ( ( windowWidth - bWidth ) / 2 );
     int br = (int) ( windowWidth - bl );
-    mBRefresh.SetPos( bl, (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.25 ), bHeight );
-    mBSearch.SetPos( (int) ( bl + bHeight * 0.35 ), (int) ( bHeight * 0.75 ), (int) ( bl + bHeight * 0.6 ), bHeight );
+    mBRefresh.SetPos( bl, (int) ( bHeight * 0.7 ), (int) ( bl + bHeight * 0.25 ), (int) ( bHeight * 0.95 ) );
+    mBSearch.SetPos( (int) ( bl + bHeight * 0.35 ), (int) ( bHeight * 0.70 ), (int) ( bl + bHeight * 0.6 ), (int) ( bHeight * 0.95 ) );
     mBSetting.SetPos( (int) ( br - bHeight * 0.25 ), (int) ( windowWidth - br ), br, (int) ( windowWidth - br + bHeight * 0.25 ) );
     mScroll.SetPos( (int) bl, (int) bHeight, (int) br, (int) ( windowHeight - bl ) );
   }

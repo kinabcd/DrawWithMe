@@ -31,9 +31,6 @@ public class CSelectPen extends KinView {
   KinPoint mSizeDemo;
 
   public CSelectPen() {
-  }
-
-  public void LoadContent() {
     mBackground = new KinImage();
     mCancel = new KinImage();
     mCancel.AddImage( R.drawable.selectpen_cancel, -1 );

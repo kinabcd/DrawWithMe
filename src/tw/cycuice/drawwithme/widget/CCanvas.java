@@ -31,7 +31,6 @@ public class CCanvas extends KinView {
   IActionCotroller mProtocal;
   Bitmap mBitmap;
   Canvas mCanvas;
-  Rect mWindowRect; // 螢幕上顯示的範圍
   int mBackgroundColor;
   Action mNewAction;
   String pc;
@@ -55,7 +54,7 @@ public class CCanvas extends KinView {
     mBackgroundColor = bgColor;
     mViewStart = new KinPoint( 0, 0 );
     mViewScaleRate = 1;
-    mViewSize = new KinPoint( mWindowRect.right - mWindowRect.left, mWindowRect.bottom - mWindowRect.top );
+    mViewSize = new KinPoint( GetWidth(), GetHeight() );
     mProtocal = new CModeSingle();
     mTouchMode = MODE.WAIT;
   }
@@ -109,8 +108,8 @@ public class CCanvas extends KinView {
   }
 
   public KinPoint ToCanvasPoint( KinPoint screenPoint ) {
-    int xOnStage = (int) ( ( screenPoint.x - mWindowRect.left ) * mViewScaleRate + mViewStart.x );
-    int yOnStage = (int) ( ( screenPoint.y - mWindowRect.top ) * mViewScaleRate + mViewStart.y );
+    int xOnStage = (int) ( ( screenPoint.x - GetX() ) * mViewScaleRate + mViewStart.x );
+    int yOnStage = (int) ( ( screenPoint.y - GetY() ) * mViewScaleRate + mViewStart.y );
     return new KinPoint( xOnStage, yOnStage );
   }
 
@@ -174,7 +173,7 @@ public class CCanvas extends KinView {
       }
     } else if ( mTouchMode == MODE.WAIT ) {
       KinPoint screenPoint = new KinPoint( event.getX(), event.getY() );
-      if ( !screenPoint.In( mWindowRect ) )
+      if ( !screenPoint.In( mViewPos ) )
         return false;
       if ( event.getAction() == MotionEvent.ACTION_DOWN )
         ChangeMode( MODE.DRAW, event );
@@ -192,7 +191,7 @@ public class CCanvas extends KinView {
     List<Action> actions = mProtocal.PullAction();
     for ( Action a : actions )
       a.Draw( mCanvas );
-    canvas.drawBitmap( mBitmap, mViewRect, mWindowRect, null );
+    canvas.drawBitmap( mBitmap, mViewRect, mViewPos, null );
     Paint m = new Paint();
     m.setColor( Color.BLACK );
     m.setStyle( Style.FILL );
@@ -209,8 +208,7 @@ public class CCanvas extends KinView {
 
   public void CompatibleWith( double windowWidth, double windowHeight ) {
     int myY = (int) ( windowHeight * ( windowHeight * ( -1 / 28800.0 ) + ( 1 / 9.0 ) ) );
-    mWindowRect = new Rect( 0, myY, (int) windowWidth, (int) windowHeight );
-    SetPos( mWindowRect );
+    SetPos( 0, myY, (int) windowWidth, (int) windowHeight );
     mHasUpdate = true;
   }
 

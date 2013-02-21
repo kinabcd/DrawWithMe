@@ -1,6 +1,7 @@
 package tw.cycuice.drawwithme.ui;
 
 import tw.cycuice.drawwithme.CConstant;
+import tw.cycuice.drawwithme.Client;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.Main;
 import tw.cycuice.drawwithme.R;
@@ -69,10 +70,10 @@ public class CMenu extends KinView implements IUI {
         final LinearLayout checkLayout = new LinearLayout( Main.sInstance );
         final CheckBox checkNo = new CheckBox( Main.sInstance );
         checkNo.setChecked( true );
-        checkNo.setText( "No." );
+        checkNo.setText( "Room No." );
         final CheckBox checkName = new CheckBox( Main.sInstance );
         checkName.setChecked( true );
-        checkName.setText( "Name" );
+        checkName.setText( "Room Name" );
         checkLayout.addView( checkNo );
         checkLayout.addView( checkName );
         view.addView( inputKeyword );
@@ -126,14 +127,18 @@ public class CMenu extends KinView implements IUI {
         inputPasswd.setHint( "Password..." );
         inputPasswd.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
         inputPasswd.setTypeface( Typeface.SERIF );
+        final CheckBox checkRemember = new CheckBox( Main.sInstance );
+        checkRemember.setChecked( true );
+        checkRemember.setText( "Remember me" );
 
         view.addView( inputAccount );
         view.addView( inputPasswd );
+        view.addView( checkRemember );
         builder.setView( view );
         builder.setPositiveButton( "Login", new DialogInterface.OnClickListener() {
           @Override
           public void onClick( DialogInterface dialog, int which ) {
-            Toast.makeText( Main.sInstance, "Login Failed!!", Toast.LENGTH_LONG ).show();
+            Client.Login( inputAccount.getText().toString(), inputPasswd.getText().toString() );
           }
         } );
         builder.setNeutralButton( "Register", new DialogInterface.OnClickListener() {

@@ -24,6 +24,7 @@ public class CDrawBoard extends KinView implements IUI {
   KinButton mBSelectColor;
   KinButton mBCamera;
   KinButton mBSetting;
+  KinButton mBDialogBox;
   KinImage mTopbarBG;
 
   public CDrawBoard() {
@@ -81,11 +82,22 @@ public class CDrawBoard extends KinView implements IUI {
       public void run() {
       }
     } );
+    
+    KinImage imgDialogBox = new KinImage();
+    imgDialogBox.AddImage( R.drawable.board_dialogbox, -1 );
+    mBDialogBox = new KinButton( imgDialogBox );
+    mBDialogBox.SetOnClickRun( new Runnable() {
+
+      @Override
+      public void run() {
+      }
+    } );
     mTopbarBG = new KinImage();
     mTopbarBG.AddImage( R.drawable.board_topbar_bg, -1 );
     mTopbarBG.SetAlignment( Alignment.FILL, Alignment.TOP );
 
     AddChild( mTopbarBG );
+    AddChild( mBDialogBox );
     AddChild( mBSetting );
     AddChild( mBCamera );
     AddChild( mBSelectPen );
@@ -105,6 +117,7 @@ public class CDrawBoard extends KinView implements IUI {
     mBSelectColor.SetPos( bSize, 0, bSize * 2, bSize );
     mBCamera.SetPos( bSize * 2, 0, bSize * 3, bSize );
     mBSetting.SetPos( bSize * 3, 0, bSize * 4, bSize );
+    mBDialogBox.SetPos( bSize * 4, 0, bSize * 5, bSize );
     mTopbarBG.SetSize( (int) windowWidth, bSize );
     mUISelectColor.CompatibleWith( windowWidth, windowHeight );
     mUISelectPen.CompatibleWith( windowWidth, windowHeight );

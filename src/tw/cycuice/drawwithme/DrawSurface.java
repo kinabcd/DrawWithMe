@@ -5,6 +5,7 @@ import tw.cycuice.drawwithme.ui.CMemberCenter;
 import tw.cycuice.drawwithme.ui.CMenu;
 import tw.cycuice.drawwithme.ui.CNew;
 import tw.cycuice.drawwithme.ui.IUI;
+import tw.kin.android.KinView.Alignment;
 import tw.kin.android.widget.KinImage;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -33,6 +34,7 @@ public class DrawSurface extends SurfaceView implements Callback {
   CNew mUINew;
   static DrawSurface sInstance = null;
   Handler mDrawHandler;
+  Client mClient;
 
   public static DrawSurface GetInstance() {
     if ( sInstance == null )
@@ -129,6 +131,7 @@ public class DrawSurface extends SurfaceView implements Callback {
       KinImage mTitle = new KinImage();
       mTitle.AddImage( R.drawable.menu_title, -1 );
       mTitle.SetSize( mWindowWidth * 0.95, mWindowHeight * 0.25 );
+      mTitle.SetAlignment( Alignment.ABSOLUTE, Alignment.ABSOLUTE );
       mTitle.SetPos( ( mWindowWidth - mTitle.GetWidth() ) / 2, ( mWindowHeight - mTitle.GetHeight() ) / 2 );
       if ( sfh != null ) {
         Canvas canvas = sfh.lockCanvas( null );
@@ -147,6 +150,12 @@ public class DrawSurface extends SurfaceView implements Callback {
       mUICanvas.LoadContent();
       mUIMemberCenter.LoadContent();
       Resize( mWindowWidth, mWindowHeight );
+      try {
+        Thread.sleep( 500 );
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       SetPage( CConstant.PAGEMENU );
       LoadContent = null; // 讀取後自動銷毀
     }

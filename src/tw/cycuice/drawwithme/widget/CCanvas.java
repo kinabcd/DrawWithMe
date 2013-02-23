@@ -8,6 +8,7 @@ import java.util.List;
 import tw.cycuice.drawwithme.CConstant;
 import tw.cycuice.drawwithme.DrawSurface;
 import tw.cycuice.drawwithme.protocal.Action;
+import tw.cycuice.drawwithme.protocal.CModeInternet;
 import tw.cycuice.drawwithme.protocal.CModeSingle;
 import tw.cycuice.drawwithme.protocal.IActionCotroller;
 import tw.cycuice.drawwithme.ui.CDrawBoard;
@@ -55,7 +56,7 @@ public class CCanvas extends KinView {
     mViewStart = new KinPoint( 0, 0 );
     mViewScaleRate = 1;
     mViewSize = new KinPoint( GetWidth(), GetHeight() );
-    mProtocal = new CModeSingle();
+    mProtocal = new CModeInternet();
     mTouchMode = MODE.WAIT;
   }
 
@@ -164,8 +165,8 @@ public class CCanvas extends KinView {
       if ( event.getAction() == MotionEvent.ACTION_MOVE ) {
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
         mPointCount += 1;
-        if ( mPointCount > 5 )
-          mProtocal.PushAction( mNewAction );
+        //if ( mPointCount > 5 )
+          //mProtocal.PushAction( mNewAction );
       }
       if ( event.getAction() == MotionEvent.ACTION_UP ) {
         mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );

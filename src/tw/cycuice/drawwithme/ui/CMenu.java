@@ -13,13 +13,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 public class CMenu extends KinView implements IUI {
   KinImage mBackground;
@@ -51,6 +51,7 @@ public class CMenu extends KinView implements IUI {
       @Override
       public void run() {
         // TODO refresh menu
+        
       }
     } );
     KinImage iSearch = new KinImage();
@@ -93,7 +94,8 @@ public class CMenu extends KinView implements IUI {
     mBSetting.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
-        DrawSurface.GetInstance().SetPage( CConstant.PAGEMEMBER );
+        if ( Client.IsLogin() )
+          DrawSurface.GetInstance().SetPage( CConstant.PAGEMEMBER );
       }
     } );
     KinImage iCreate = new KinImage();
@@ -123,10 +125,12 @@ public class CMenu extends KinView implements IUI {
         inputAccount.setHint( "Account..." );
         inputAccount.setInputType( InputType.TYPE_CLASS_TEXT );
         inputAccount.setTypeface( Typeface.SERIF );
+        inputAccount.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
         final EditText inputPasswd = new EditText( Main.sInstance );
         inputPasswd.setHint( "Password..." );
         inputPasswd.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
         inputPasswd.setTypeface( Typeface.SERIF );
+        inputPasswd.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
         final CheckBox checkRemember = new CheckBox( Main.sInstance );
         checkRemember.setChecked( true );
         checkRemember.setText( "Remember me" );
@@ -145,13 +149,33 @@ public class CMenu extends KinView implements IUI {
           @Override
           public void onClick( DialogInterface dialog, int which ) {
             LayoutInflater inflater = LayoutInflater.from( Main.sInstance );
-            View register = inflater.inflate( R.layout.register, null );
+            final View register = inflater.inflate( R.layout.register, null );
             AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
             builder.setTitle( "Register" );
             builder.setView( register );
             builder.setPositiveButton( "Register", new DialogInterface.OnClickListener() {
               @Override
               public void onClick( DialogInterface dialog, int which ) {
+                EditText etAccount = (EditText) register.findViewById( R.id.editTextAccount );
+                etAccount.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
+                String account = new String( etAccount.getText().toString() );
+
+                EditText etPassword = (EditText) register.findViewById( R.id.editTextPassword );
+                etPassword.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
+                String password = new String( etPassword.getText().toString() );
+
+                EditText etConfirm = (EditText) register.findViewById( R.id.editTextConfirm );
+                etConfirm.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
+                String confirm = new String( etConfirm.getText().toString() );
+
+                EditText etNickname = (EditText) register.findViewById( R.id.editTextNickname );
+                etNickname.setFilters( new InputFilter[] { CConstant.NICKNAMEFILTER, new InputFilter.LengthFilter( 16 ) } );
+                String nickname = new String( etNickname.getText().toString() );
+
+                if ( password.equals( confirm ) )
+                  Client.Register( account, nickname, password );
+                else
+                  ;// TODO show confirm error
               }
             } );
             builder.show();

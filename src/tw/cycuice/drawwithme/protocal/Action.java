@@ -22,6 +22,7 @@ public class Action {
   int mLastDrawPointIndex;
   Bitmap mTempBitmap;
   Bitmap mTempBitmapNeon;
+  boolean mIsCompleted;
 
   public Action(int op, Rect view, int pen, int penColor, int penSize) {
     mOpre = op;

@@ -1,10 +1,9 @@
 package tw.ome.drawwithme.protocal;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -27,8 +26,6 @@ public class CModeInternet implements IActionCotroller {
   SocketChannel mServer;
   HandlerThread mSentThread;
   Handler mSentHandler;
-  DataInputStream mIn;
-  DataOutputStream mOut;
   boolean mIsLogin;
   List<Action> mActions;
   int mSendingId;
@@ -36,6 +33,7 @@ public class CModeInternet implements IActionCotroller {
   int mSendingPart;
   Selector selector = null;
   SelectionKey key = null;
+  ByteBuffer mBufferIn;
 
   CModeInternet() {
     sInstance = this;
@@ -45,6 +43,7 @@ public class CModeInternet implements IActionCotroller {
     mIsLogin = false;
     mActions = Collections.synchronizedList( new LinkedList<Action>() );
     mSendingId = -1;
+    mBufferIn = ByteBuffer.allocate( 10240 );
   }
 
   static public CModeInternet GetClient() {
@@ -436,17 +435,23 @@ public class CModeInternet implements IActionCotroller {
   }
 
   // ======================================================================================================
-  void PackageParser( byte head ) {
-    if ( head == 0x20 ) { // 伺服器確認收到K號封包
-      try {
+  boolean PackageParser() {
+    // 回傳是否成功處理一個封包
+    int bufferLen = mBufferIn.limit() - mBufferIn.position();
+    if ( bufferLen == 0 )
+      return false; // 沒有新訊息
+    try {
+      byte head = mBufferIn.get();
+      if ( head == 0x20 ) { // 伺服器確認收到K號封包
+        if ( bufferLen < 5 )
+          return false; // 封包長度不足
         int b = ReadByte();
         ReadInt();
         Log.i( "0x20", "Receive" + Integer.toString( b ) );
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else if ( head == 0x21 ) { // 註冊結果
-      try {
+        return true;
+      } else if ( head == 0x21 ) { // 註冊結果
+        if ( bufferLen < 5 )
+          return false; // 封包長度不足
         int regResult = ReadInt();
         if ( regResult == 0 )
           Log.i( "0x21", "Register Success!" );
@@ -459,11 +464,8 @@ public class CModeInternet implements IActionCotroller {
         else if ( regResult == 3 )
           Log.i( "0x21", "Nickname Error!" );
 
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else if ( head == 0x22 ) { // 登入結果
-      try {
+        return true;
+      } else if ( head == 0x22 ) { // 登入結果
         int loginResult = ReadInt();
         int accountNumber = ReadInt();
         String nickname = ReadString( 32 );
@@ -473,27 +475,30 @@ public class CModeInternet implements IActionCotroller {
           Log.i( "0x22", "Nickname: " + nickname );
         } else if ( loginResult == 1 )
           Log.i( "0x22", "Login Failed!" );
-      } catch (IOException e) {
-        e.printStackTrace();
+        return true;
+      } else {
+        Log.i( "Package", "Unknowed:" + head );
+        return true;
       }
+    } catch (BufferUnderflowException e) {// 封包長度不足
+      return false;
     }
-
   }
 
-  int ReadByte() throws IOException {
-    return mIn.read();
+  byte ReadByte() throws BufferUnderflowException {
+    return mBufferIn.get();
   }
 
-  int ReadInt() throws IOException {
+  int ReadInt() throws BufferUnderflowException {
     byte bType[] = new byte[4];
-    mIn.read( bType, 0, 4 );
+    mBufferIn.get( bType );
     return ( bType[0] & 0xff ) | ( ( bType[1] << 8 ) & 0xff00 ) | ( ( bType[2] << 24 ) >>> 8 ) | ( bType[3] << 24 );
 
   }
 
-  String ReadString( int length ) throws IOException {
+  String ReadString( int length ) throws BufferUnderflowException {
     byte bs[] = new byte[length];
-    mIn.read( bs, 0, length );
+    mBufferIn.get( bs );
     String s = new String( bs );
     int last = s.indexOf( '\0' );
     if ( last == -1 )
@@ -513,7 +518,6 @@ public class CModeInternet implements IActionCotroller {
         if ( selector == null )
           return;
         if ( selector.select( 500 ) > 0 ) {
-          System.out.println( "3" );
           Set<SelectionKey> set = selector.selectedKeys();
           Iterator<SelectionKey> it = set.iterator();
 
@@ -522,22 +526,16 @@ public class CModeInternet implements IActionCotroller {
             it.remove();
             if ( key.isReadable() ) {
               SocketChannel sc = (SocketChannel) key.channel();
-              ByteBuffer buffer = ByteBuffer.allocate( 1024 );
               int read;
-              while ( ( read = sc.read( buffer ) ) != -1 ) {
-                if ( read == 0 ) {
-                  break;
-                }
-                buffer.flip();
-                byte[] array = new byte[read];
-                buffer.get( array );
-                String s = new String( array );
-                System.out.print( s );
-                buffer.clear();
-
+              while ( ( read = sc.read( mBufferIn ) ) > 0 ) {
+                mBufferIn.flip(); // 準備處理
+                int pos = 0;
+                while ( PackageParser() )
+                  pos = mBufferIn.position();
+                mBufferIn.position( pos );
+                mBufferIn.compact(); // 回存未處理的訊息
               }
-              System.out.println();
-              if ( read == -1 )
+              if ( read == -1 ) // EOF (意外中斷連線)
                 CloseSocket();
             }
           }

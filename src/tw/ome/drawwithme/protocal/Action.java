@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Rect;
 
 public class Action {
   static int sIndex = 0;
@@ -18,13 +17,13 @@ public class Action {
   int mColor;
   int mSize;
   LinkedList<KinPoint> mPath;
-  
+
   int mLastDrawPointIndex;
   Bitmap mTempBitmap;
   Bitmap mTempBitmapNeon;
   boolean mIsCompleted;
 
-  public Action(Rect view, int pen, int penColor, int penSize) {
+  public Action(int pen, int penColor, int penSize) {
     mId = sIndex;
     sIndex += 1;
     mPen = pen;

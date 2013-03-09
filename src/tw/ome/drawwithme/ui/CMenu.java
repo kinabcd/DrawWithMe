@@ -3,6 +3,7 @@ package tw.ome.drawwithme.ui;
 import tw.kin.android.layout.KinAbsoluteLayout;
 import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
+import tw.kin.android.widget.KinLable;
 import tw.kin.android.widget.KinScroll;
 import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
@@ -23,6 +24,35 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 public class CMenu extends KinAbsoluteLayout implements IUI {
+  class Room extends KinAbsoluteLayout {
+    KinImage mLock = new KinImage();
+    KinLable mNum = new KinLable();
+    KinLable mId = new KinLable();
+    KinLable mName = new KinLable();
+
+    public Room(int id, String name, boolean lock, int peopleNum) {
+      SetSizePercent( 1, 0.2 );
+      if ( lock )
+        mLock.AddImage( Main.lib.GetBitmap( R.drawable.chat_lock ), -1 );
+      mLock.SetSizePercent( 0.5, 0.5 );
+      mId.SetText( "" + id );
+      mId.SetSizePercent( 0.5, 0.5 );
+      mName.SetText( name );
+      mName.SetSizePercent( 1, 0.5 );
+      mNum.SetText( peopleNum + "/" + 8 );
+      mNum.SetSizePercent( 0.2, 0.25 );
+      SetAlignment( mId, Alignment.LEFT, Alignment.TOP );
+      SetAlignment( mLock, Alignment.CENTER, Alignment.TOP );
+      SetAlignment( mName, Alignment.RIGHT, Alignment.BOTTOM );
+      SetAlignment( mNum, Alignment.RIGHT, Alignment.TOP );
+      AddChild( mNum );
+      AddChild( mId );
+      AddChild( mName );
+      AddChild( mLock );
+
+    }
+  }
+
   KinImage mBackground;
   KinImage mTitle;
   KinButton mBRefresh;
@@ -38,15 +68,15 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
 
   public void LoadContent() {
     mBackground = new KinImage();
-    mBackground.AddImage( R.drawable.menu_bg, -1 );
+    mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
     mBackground.SetSizePercent( 1, 1 );
     mTitle = new KinImage();
-    mTitle.AddImage( R.drawable.menu_title, -1 );
+    mTitle.AddImage( Main.lib.GetBitmap( R.drawable.menu_title ), -1 );
     mTitle.SetSizePercent( 0.95, 0.25 ); // 設定標題大小(百分比)
     SetAlignment( mTitle, Alignment.CENTER, Alignment.TOP );
 
     KinImage iRefresh = new KinImage();
-    iRefresh.AddImage( R.drawable.menu_refresh, -1 );
+    iRefresh.AddImage( Main.lib.GetBitmap( R.drawable.menu_refresh ), -1 );
     mBRefresh = new KinButton( iRefresh );
     mBRefresh.SetOnClickRun( new Runnable() {
       @Override
@@ -56,7 +86,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iSearch = new KinImage();
-    iSearch.AddImage( R.drawable.menu_search, -1 );
+    iSearch.AddImage( Main.lib.GetBitmap( R.drawable.menu_search ), -1 );
     mBSearch = new KinButton( iSearch );
     mBSearch.SetOnClickRun( new Runnable() {
       @Override
@@ -90,7 +120,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iSetting = new KinImage();
-    iSetting.AddImage( R.drawable.menu_setting, -1 );
+    iSetting.AddImage( Main.lib.GetBitmap( R.drawable.menu_setting ), -1 );
     mBSetting = new KinButton( iSetting );
     mBSetting.SetOnClickRun( new Runnable() {
       @Override
@@ -100,7 +130,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iCreate = new KinImage();
-    iCreate.AddImage( R.drawable.menu_create, -1 );
+    iCreate.AddImage( Main.lib.GetBitmap( R.drawable.menu_create ), -1 );
     mBCreate = new KinButton( iCreate );
     mBCreate.SetOnClickRun( new Runnable() {
       @Override
@@ -109,7 +139,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iLogin = new KinImage();
-    iLogin.AddImage( R.drawable.menu_login, -1 );
+    iLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login ), -1 );
     mBLogin = new KinButton( iLogin );
     mBLogin.SetOnClickRun( new Runnable() {
       @Override
@@ -211,6 +241,9 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
   @Override
   public void onStart( IUI from ) {
     mScroll.SetScroll( 0 );
+    mScroll.GetLayout().AddChild( new Room( 0, "YOzGOGO", false, 5 ) );
+    mScroll.GetLayout().AddChild( new Room( 1, "HeHeHe", false, 4 ) );
+    mScroll.GetLayout().AddChild( new Room( 2, "kerker", false, 3 ) );
     RequireRedraw();
   }
 

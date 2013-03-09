@@ -76,7 +76,7 @@ public class CCanvas extends KinAbsoluteLayout {
       int size = ( (CDrawBoard) GetParent() ).mUISelectPen.GetSize();
       if ( pen == CConstant.PENERASER )
         color = mBackgroundColor;
-      mNewAction = new Action( mViewRect, pen, color, size );
+      mNewAction = new Action( pen, color, size );
       mNewAction.AddPoint( ToCanvasPoint( screenPoint ) );
       mPointCount = 0;
       mTouchMode = MODE.DRAW;
@@ -104,6 +104,7 @@ public class CCanvas extends KinAbsoluteLayout {
       if ( mViewStart.y < 0 )
         mViewStart.y = 0;
       mTouchMode = MODE.WAIT;
+      RequireRedraw();
     }
   }
 

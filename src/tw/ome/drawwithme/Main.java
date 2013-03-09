@@ -12,6 +12,7 @@ import android.view.WindowManager;
 
 public class Main extends Activity {
   public static Main sInstance = null;
+  public static KinLib lib = null;
 
   @Override
   public void onPause() {
@@ -31,9 +32,10 @@ public class Main extends Activity {
   @Override
   public void onCreate( Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
-    getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
+    lib = new KinLib();
+    //getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
     requestWindowFeature( Window.FEATURE_NO_TITLE ); // 設定成No title
-    KinLib.SetContext( this );
+    lib.SetContext( this );
     getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN );
     if ( sInstance != null ) {
       ViewGroup vg = (ViewGroup) ( DrawSurface.GetInstance().getParent() );

@@ -7,6 +7,7 @@ import tw.kin.android.widget.KinImage;
 import tw.kin.android.widget.KinLable;
 import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
+import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 import tw.ome.drawwithme.protocal.CModeInternet;
 import android.view.KeyEvent;
@@ -43,10 +44,10 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
   @Override
   public void LoadContent() {
     mBackground = new KinImage();
-    mBackground.AddImage( R.drawable.menu_bg, -1 );
+    mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
     mBackground.SetSizePercent( 1, 1 );
     mTitle = new KinImage();
-    mTitle.AddImage( R.drawable.menu_title, -1 );
+    mTitle.AddImage( Main.lib.GetBitmap( R.drawable.menu_title ), -1 );
     mTitle.SetSizePercent( 0.95, 0.25 ); // 設定標題大小(百分比)
     SetAlignment( mTitle, Alignment.CENTER, Alignment.TOP );
 
@@ -58,7 +59,7 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     mPassword.SetSizePercent( 0.75, 0.1 );
 
     KinImage iLogout = new KinImage();
-    iLogout.AddImage( R.drawable.logout, -1 );
+    iLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout ), -1 );
     mBLogout = new KinButton( iLogout );
     mBLogout.SetOnClickRun( new Runnable() {
       @Override
@@ -68,15 +69,15 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iChangeNickname = new KinImage();
-    iChangeNickname.AddImage( R.drawable.edit, -1 );
+    iChangeNickname.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
     mBChangeNickname = new KinButton( iChangeNickname );
     // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
     KinImage iChangePassword = new KinImage();
-    iChangePassword.AddImage( R.drawable.edit, -1 );
+    iChangePassword.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
     mBChangePassword = new KinButton( iChangePassword );
     // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
     KinImage iOK = new KinImage();
-    iOK.AddImage( R.drawable.new_ok, -1 );
+    iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
     mBOK = new KinButton( iOK );
     SetAlignment( mBOK, Alignment.CENTER, Alignment.BOTTOM );
     mBOK.SetOnClickRun( new Runnable() {

@@ -49,10 +49,10 @@ public class CNew extends KinAbsoluteLayout implements IUI {
 
   public void LoadContent() {
     mBackground = new KinImage();
-    mBackground.AddImage( R.drawable.menu_bg, -1 );
+    mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
     mBackground.SetSizePercent( 1, 1 );
     KinImage iOK = new KinImage();
-    iOK.AddImage( R.drawable.new_ok, -1 );
+    iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
     mBOK = new KinButton( iOK );
     SetAlignment( mBOK, Alignment.RIGHT, Alignment.BOTTOM );
     mBOK.SetOnClickRun( new Runnable() {
@@ -66,7 +66,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iDefaultSize = new KinImage();
-    iDefaultSize.AddImage( R.drawable.new_select_bg, -1 );
+    iDefaultSize.AddImage( Main.lib.GetBitmap( R.drawable.new_select_bg ), -1 );
     mBSelectColor = new KinButton( iDefaultSize );
     mBSelectColor.SetOnClickRun( new Runnable() {
       @Override
@@ -75,7 +75,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
       }
     } );
     KinImage iReset = new KinImage();
-    iReset.AddImage( R.drawable.new_reset, -1 );
+    iReset.AddImage( Main.lib.GetBitmap( R.drawable.new_reset ), -1 );
     mBReset = new KinButton( iReset );
     SetAlignment( mBReset, Alignment.LEFT, Alignment.BOTTOM );
     mBReset.SetOnClickRun( new Runnable() {
@@ -102,8 +102,8 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mTextPaint.setARGB( 0xff, 220, 220, 255 );
 
     mBCheckOnline = new KinButton();
-    mBCheckOnline.AddImage( R.drawable.online, -1 );
-    mBCheckOnline.AddImage( R.drawable.offline, -1 );
+    mBCheckOnline.AddImage( Main.lib.GetBitmap( R.drawable.online ), -1 );
+    mBCheckOnline.AddImage( Main.lib.GetBitmap( R.drawable.offline ), -1 );
     mBCheckOnline.SetOnClickRun( new Runnable() {
       @Override
       public void run() {

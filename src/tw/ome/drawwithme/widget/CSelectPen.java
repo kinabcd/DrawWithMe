@@ -6,6 +6,7 @@ import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
 import tw.kin.android.widget.KinSeekBar;
 import tw.ome.drawwithme.CConstant;
+import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,7 +35,7 @@ public class CSelectPen extends KinAbsoluteLayout {
   public CSelectPen() {
     mBackground = new KinImage();
     mCancel = new KinImage();
-    mCancel.AddImage( R.drawable.selectpen_cancel, -1 );
+    mCancel.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_cancel ), -1 );
     mBCancel = new KinButton( mCancel );
     mBCancel.SetOnClickRun( new Runnable() {
       @Override
@@ -47,12 +48,12 @@ public class CSelectPen extends KinAbsoluteLayout {
     for ( int i = 0; i < 6; i += 1 )
       mPenType[i] = new KinImage();
 
-    mPenType[0].AddImage( R.drawable.selectpen_normal, -1 );
-    mPenType[1].AddImage( R.drawable.selectpen_eraser, -1 );
-    mPenType[2].AddImage( R.drawable.selectpen_highlighter, -1 );
-    mPenType[3].AddImage( R.drawable.selectpen_watercolor, -1 );
-    mPenType[4].AddImage( R.drawable.selectpen_neon, -1 );
-    mPenType[5].AddImage( R.drawable.selectpen_lock, -1 );
+    mPenType[0].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_normal ), -1 );
+    mPenType[1].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_eraser ), -1 );
+    mPenType[2].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_highlighter ), -1 );
+    mPenType[3].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_watercolor ), -1 );
+    mPenType[4].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_neon ), -1 );
+    mPenType[5].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_lock ), -1 );
 
     mB_Normal = new KinButton( mPenType[0] ); // 一般畫筆
     mB_Normal.SetOnClickRun( new Runnable() {

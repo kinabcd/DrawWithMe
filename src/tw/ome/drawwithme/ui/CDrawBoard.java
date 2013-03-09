@@ -39,7 +39,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     mUIChat = new CChat();
     mUICanvas = new CCanvas();
     KinImage imgSelectPen = new KinImage();
-    imgSelectPen.AddImage( R.drawable.board_selectpen, -1 );
+    imgSelectPen.AddImage( Main.lib.GetBitmap( R.drawable.board_selectpen ), -1 );
     mBSelectPen = new KinButton( imgSelectPen );
     mBSelectPen.SetOnClickRun( new Runnable() {
       @Override
@@ -52,7 +52,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     } );
 
     KinImage imgSelectColor = new KinImage();
-    imgSelectColor.AddImage( R.drawable.board_selectcolor, -1 );
+    imgSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.board_selectcolor ), -1 );
     mBSelectColor = new KinButton( imgSelectColor );
     mBSelectColor.SetOnClickRun( new Runnable() {
       @Override
@@ -65,7 +65,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     } );
 
     KinImage imgCamera = new KinImage();
-    imgCamera.AddImage( R.drawable.board_camera, -1 );
+    imgCamera.AddImage( Main.lib.GetBitmap( R.drawable.board_camera ), -1 );
     mBCamera = new KinButton( imgCamera );
     mBCamera.SetOnClickRun( new Runnable() {
 
@@ -77,7 +77,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     } );
 
     KinImage imgSetting = new KinImage();
-    imgSetting.AddImage( R.drawable.board_setting, -1 );
+    imgSetting.AddImage( Main.lib.GetBitmap( R.drawable.board_setting ), -1 );
     mBSetting = new KinButton( imgSetting );
     mBSetting.SetOnClickRun( new Runnable() {
 
@@ -87,7 +87,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     } );
 
     KinImage imgDialogBox = new KinImage();
-    imgDialogBox.AddImage( R.drawable.board_dialogbox, -1 );
+    imgDialogBox.AddImage( Main.lib.GetBitmap( R.drawable.board_dialogbox ), -1 );
     mBChat = new KinButton( imgDialogBox );
     mBChat.SetOnClickRun( new Runnable() {
 
@@ -100,7 +100,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
       }
     } );
     mTopbarBG = new KinImage();
-    mTopbarBG.AddImage( R.drawable.board_topbar_bg, -1 );
+    mTopbarBG.AddImage( Main.lib.GetBitmap( R.drawable.board_topbar_bg ), -1 );
     SetAlignment( mTopbarBG, Alignment.LEFT, Alignment.TOP );
 
     AddChild( mTopbarBG );

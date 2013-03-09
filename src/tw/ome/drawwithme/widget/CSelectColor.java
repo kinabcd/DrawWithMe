@@ -1,5 +1,6 @@
 package tw.ome.drawwithme.widget;
 
+import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinImage;
@@ -58,10 +59,10 @@ public class CSelectColor extends KinView {
     mBaseColor = new int[8];
     mSelectors = new KinImage[8];
     mShadow = new KinImage();
-    mShadow.AddImage( R.drawable.selectcolor_fan_shadow, -1 );
+    mShadow.AddImage( Main.lib.GetBitmap( R.drawable.selectcolor_fan_shadow ), -1 );
     for ( int i = 0; i < 8; i += 1 ) {
       mSelectors[i] = new KinImage();
-      mSelectors[i].AddImage( R.drawable.selectcolor_fan, -1 );
+      mSelectors[i].AddImage( Main.lib.GetBitmap( R.drawable.selectcolor_fan ), -1 );
     }
     SetSelectorColor( 0, 0xffff0000 );
     SetSelectorColor( 1, 0xffffff00 );
@@ -136,6 +137,7 @@ public class CSelectColor extends KinView {
 
     return true;
   }
+
   @Override
   public boolean onKeyDown( int keycode, KeyEvent event ) {
     if ( !IsVisible() )

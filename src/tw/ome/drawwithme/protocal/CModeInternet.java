@@ -19,6 +19,7 @@ import tw.ome.drawwithme.DrawSurface;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.SparseArray;
 
 public class CModeInternet implements IActionCotroller {
   public static final int SERVERPORT = 55661;
@@ -34,6 +35,7 @@ public class CModeInternet implements IActionCotroller {
   Selector selector = null;
   SelectionKey key = null;
   ByteBuffer mBufferIn;
+  SparseArray<Action> mInActions;
 
   CModeInternet() {
     sInstance = this;
@@ -44,6 +46,7 @@ public class CModeInternet implements IActionCotroller {
     mActions = Collections.synchronizedList( new LinkedList<Action>() );
     mSendingId = -1;
     mBufferIn = ByteBuffer.allocate( 10240 );
+    mInActions = new SparseArray<Action>();
   }
 
   static public CModeInternet GetClient() {
@@ -92,7 +95,7 @@ public class CModeInternet implements IActionCotroller {
   }
 
   public void SendPacket( final byte content[] ) {
-    mSentHandler.postAtFrontOfQueue( new Runnable() {
+    mSentHandler.post( new Runnable() {
       @Override
       public void run() {
         if ( !IsConnect() )
@@ -316,7 +319,7 @@ public class CModeInternet implements IActionCotroller {
     // GetClient().SendPacket( text );
   }
 
-  public static void StartSendPoint( int strokeNumber, int packetNum, int size, int style, int color ) {
+  public static void StartSendPoint( int strokeNumber, int size, int style, int color ) {
     // 13 我要開始傳N個點囉
     // 00~00 封包自己的編號 (1 Byte)
     // 01~04 筆畫編號 (int)
@@ -324,19 +327,17 @@ public class CModeInternet implements IActionCotroller {
     // 09~12 筆的大小 (int)
     // 13~16 筆的樣式 (int)
     // 17~20 筆的顏色 (int)
-    byte text[] = new byte[21];
+    byte text[] = new byte[17];
     text[0] = 0x0D;
     byte byteSn[] = BytesFrom( strokeNumber ); // int to byte[]
-    byte bytePn[] = BytesFrom( packetNum );
     byte byteSi[] = BytesFrom( size );
     byte byteSt[] = BytesFrom( style );
     byte byteCo[] = BytesFrom( color );
 
     ByteCopy( text, byteSn, 1, 4 );
-    ByteCopy( text, bytePn, 5, 4 );
-    ByteCopy( text, byteSi, 9, 4 );
-    ByteCopy( text, byteSt, 13, 4 );
-    ByteCopy( text, byteCo, 17, 4 );
+    ByteCopy( text, byteSi, 5, 4 );
+    ByteCopy( text, byteSt, 9, 4 );
+    ByteCopy( text, byteCo, 13, 4 );
 
     GetClient().SendPacket( text );
   }
@@ -372,6 +373,18 @@ public class CModeInternet implements IActionCotroller {
     GetClient().SendPacket( text );
   }
 
+  public static void EndSendPoint( int strokeNumber ) {
+    // 00~00 封包自己的編號 (1 Byte)
+    // 01~04 筆畫編號 (int)
+    byte text[] = new byte[5];
+    text[0] = 0x0F;
+    byte byteSn[] = BytesFrom( strokeNumber ); // int to byte[]
+
+    ByteCopy( text, byteSn, 1, 4 );
+
+    GetClient().SendPacket( text );
+  }
+
   public static void CheckConnect() {
     // 16 確認連線
     // 00~00 封包自己的編號 (1 Byte)
@@ -400,12 +413,11 @@ public class CModeInternet implements IActionCotroller {
   }
 
   public void PushAction( Action newAction ) {
-    mActions.add( newAction );
     if ( mSendingId != newAction.mId ) {
       mSendingId = newAction.mId;
       mSendingLast = 0;
       mSendingPart = 0;
-      StartSendPoint( newAction.mId, 0, newAction.mSize, newAction.mPen, newAction.mColor );
+      StartSendPoint( newAction.mId, newAction.mSize, newAction.mPen, newAction.mColor );
     }
     int unsendnum = newAction.mPath.size() - mSendingLast;
     if ( unsendnum > 20 || newAction.mIsCompleted ) {
@@ -413,6 +425,8 @@ public class CModeInternet implements IActionCotroller {
       SendPoint( newAction.mId, mSendingPart, unsendnum, path );
       mSendingLast = newAction.mPath.size();
       mSendingPart += 1;
+      if ( newAction.mIsCompleted )
+        EndSendPoint( newAction.mId );
     }
     DrawSurface.GetInstance().RequireRedraw();
 
@@ -443,46 +457,202 @@ public class CModeInternet implements IActionCotroller {
     try {
       byte head = mBufferIn.get();
       if ( head == 0x20 ) { // 伺服器確認收到K號封包
-        if ( bufferLen < 5 )
-          return false; // 封包長度不足
+        if ( bufferLen < 6 ) {
+          Log.i( "0x20", "BufferLen Error" );
+          return false;
+        }
         int b = ReadByte();
-        ReadInt();
-        Log.i( "0x20", "Receive" + Integer.toString( b ) );
+        int packetNum = ReadInt();
+        Log.i( "0x20", "Server Receive: " + Integer.toString( b ) );
         return true;
       } else if ( head == 0x21 ) { // 註冊結果
-        if ( bufferLen < 5 )
-          return false; // 封包長度不足
+        if ( bufferLen < 5 ) {
+          Log.i( "0x21", "BufferLen Error" );
+          return false;
+        }
         int regResult = ReadInt();
         if ( regResult == 0 )
-          Log.i( "0x21", "Register Success!" );
+          Log.i( "0x21_0", "Register Success!" );
         else if ( regResult == 1 )
-          Log.i( "0x21", "Account Repeat!" );
+          Log.i( "0x21_1", "Account Repeat!" );
         else if ( regResult == 2 )
-          Log.i( "0x21", "Account Error!" );
+          Log.i( "0x21_2", "Account Error!" );
         else if ( regResult == 3 )
-          Log.i( "0x21", "Password Error!" );
-        else if ( regResult == 3 )
-          Log.i( "0x21", "Nickname Error!" );
+          Log.i( "0x21_3", "Password Error!" );
+        else if ( regResult == 4 )
+          Log.i( "0x21_4", "Nickname Error!" );
 
         return true;
       } else if ( head == 0x22 ) { // 登入結果
-        int loginResult = ReadInt();
+        if ( bufferLen < 73 ) {
+          Log.i( "0x22", "BufferLen Error" );
+          return false;
+        }
+        int result = ReadInt();
         int accountNumber = ReadInt();
         String nickname = ReadString( 32 );
-        if ( loginResult == 0 ) {
-          Log.i( "0x22", "Login Success!" );
-          Log.i( "0x22", "accountNumber: " + Integer.toString( accountNumber ) );
-          Log.i( "0x22", "Nickname: " + nickname );
-        } else if ( loginResult == 1 )
-          Log.i( "0x22", "Login Failed!" );
+        String accessToken = ReadString( 32 );
+        if ( result == 0 ) {
+          Log.i( "0x22_0", "Login Success!" );
+          Log.i( "0x22_0", "accountNumber: " + Integer.toString( accountNumber ) );
+          Log.i( "0x22_0", "Nickname: " + nickname );
+          Log.i( "0x22_0", "accessToken: " + accessToken );
+        } else if ( result == 1 )
+          Log.i( "0x22_1", "Login Failed!" );
+        return true;
+      } else if ( head == 0x23 ) { // 密碼更改結果
+        if ( bufferLen < 5 ) {
+          Log.i( "0x23", "BufferLen Error" );
+          return false;
+        }
+        int result = ReadInt();
+        if ( result == 0 )
+          Log.i( "0x23_0", "Password Modify Success!" );
+        else if ( result == 1 )
+          Log.i( "0x23_1", "Password Error!" );
+        else if ( result == 9 )
+          Log.i( "0x23_9", "Not Login!" );
+
+        return true;
+      } else if ( head == 0x24 ) { // 暱稱更改結果
+        if ( bufferLen < 5 ) {
+          Log.i( "0x24", "BufferLen Error" );
+          return false;
+        }
+        int result = ReadInt();
+        if ( result == 0 )
+          Log.i( "0x24_0", "Nickname Modify Success!" );
+        else if ( result == 1 )
+          Log.i( "0x24_1", "Nickname Error!" );
+        else if ( result == 9 )
+          Log.i( "0x24_9", "Not Login!" );
+
+        return true;
+      } else if ( head == 0x25 ) { // 開房結果
+        if ( bufferLen < 9 ) {
+          Log.i( "0x25", "BufferLen Error" );
+          return false;
+        }
+        int result = ReadInt();
+        int id = ReadInt();
+        if ( result == 0 )
+          Log.i( "0x25_0", "Create Success!" );
+        else if ( result == 1 )
+          Log.i( "0x25_1", "Room Name Error!" );
+        else if ( result == 2 )
+          Log.i( "0x25_2", "Room Password Error!" );
+        else if ( result == 9 )
+          Log.i( "0x25_9", "Not Login!" );
+        JoinRoom( id, "" );
+
+        return true;
+      } else if ( head == 0x26 ) { // 加入房間結果
+        if ( bufferLen < 5 ) {
+          Log.i( "0x26", "BufferLen Error" );
+          return false;
+        }
+        int result = ReadInt();
+        if ( result == 0 )
+          Log.i( "0x26_0", "Join Success!" );
+        else if ( result == 1 )
+          Log.i( "0x26_1", "Password Error!" );
+        else if ( result == 2 )
+          Log.i( "0x26_2", "Room is Full!" );
+        else if ( result == 3 )
+          Log.i( "0x26_3", "You were Banned!" );
+        else if ( result == 9 )
+          Log.i( "0x26_9", "Not Login!" );
+
+        return true;
+      } else if ( head == 0x27 ) { // 搜尋結果
+        if ( bufferLen < 5 ) {
+          Log.i( "0x27", "BufferLen Error" );
+          return false;
+        }
+        int num = ReadInt();
+        if ( bufferLen < ( 5 + num * 38 ) ) {
+          Log.i( "0x27", "BufferLen Error2" );
+          return false;
+        }
+        for ( int i = 0; i < num; i += 1 ) {
+          int roomNum = ReadInt();
+          String roomName = ReadString( 32 );
+          int locked = ReadByte();
+          int peopleNum = ReadByte();
+          // 儲存 ?
+        }
+        // 顯示?
+        // DrawSurface.GetInstance().RequireRedraw();
+        Log.i( "0x27", "Receive " + Integer.toString( num ) + " search results!" );
+        return true;
+      } else if ( head == 0x28 ) { // 筆劃開始
+        if ( bufferLen < 17 ) {
+          Log.i( "0x28", "BufferLen Error" );
+          return false;
+        }
+        int drawIndex = ReadInt();
+        int size = ReadInt();
+        int style = ReadInt();
+        int color = ReadInt();
+        Action newAction = new Action( style, color, size );
+        mInActions.append( drawIndex, newAction );
+        Log.i( "0x28", "Draw number: " + Integer.toString( drawIndex ) + " start!" );
+        return true;
+      } else if ( head == 0x29 ) { // 筆劃封包
+        if ( bufferLen < 13 ) {
+          Log.i( "0x29", "BufferLen Error" );
+          return false;
+        }
+        int drawIndex = ReadInt();
+        int part = ReadInt();
+        int num = ReadInt();
+        if ( bufferLen < ( 13 + num * 8 ) ) {
+          Log.i( "0x29", "BufferLen Error2" );
+          return false;
+        }
+        Action newAction = mInActions.get( drawIndex );
+        for ( int i = 0; i < num; i += 1 ) {
+          int x = ReadInt();
+          int y = ReadInt();
+          newAction.AddPoint( new KinPoint( x, y ) );
+        }
+        mActions.add( newAction );
+        DrawSurface.GetInstance().RequireRedraw();
+        Log.i( "0x29", "Draw number: " + Integer.toString( drawIndex ) + " part " + Integer.toString( part ) + " received!" );
+        return true;
+      } else if ( head == 0x2A ) { // 筆劃結束
+        if ( bufferLen < 5 ) {
+          Log.i( "0x2A", "BufferLen Error" );
+          return false;
+        }
+        int drawIndex = ReadInt();
+        mInActions.delete( drawIndex );
+        Log.i( "0x2A", "Draw number: " + Integer.toString( drawIndex ) + " end!" );
+        return true;
+      } else if ( head == 0x2B ) { // 對話訊息
+        if ( bufferLen < 37 ) {
+          Log.i( "0x2B", "BufferLen Error" );
+          return false;
+        }
+        int length = ReadInt();
+        String name = ReadString( 32 );
+        if ( bufferLen < ( 37 + length * 2 ) ) {
+          Log.i( "0x2B", "BufferLen Error2" );
+          return false;
+        }
+        String message = ReadString( length * 2 );
+        // 印出訊息?
+        Log.i( "0x2B", "Receive Message!" );
         return true;
       } else {
         Log.i( "Package", "Unknowed:" + head );
         return true;
       }
-    } catch (BufferUnderflowException e) {// 封包長度不足
+
+    } catch (BufferUnderflowException e) { // 封包長度不足
       return false;
     }
+
   }
 
   byte ReadByte() throws BufferUnderflowException {
@@ -513,11 +683,11 @@ public class CModeInternet implements IActionCotroller {
     @Override
     public void run() {
       if ( IsConnect() )
-        mSentHandler.postDelayed( checkpack, 2000 );
+        mSentHandler.post( checkpack );
       try {
         if ( selector == null )
           return;
-        if ( selector.select( 500 ) > 0 ) {
+        if ( selector.select( 33 ) > 0 ) {
           Set<SelectionKey> set = selector.selectedKeys();
           Iterator<SelectionKey> it = set.iterator();
 

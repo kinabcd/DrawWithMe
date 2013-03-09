@@ -63,6 +63,7 @@ public class DrawSurface extends KinDrawTable {
   @Override
   public void surfaceChanged( SurfaceHolder holder, int format, int width, int height ) {
     super.surfaceChanged( holder, format, width, height );
+    System.out.println( width + "x" +height);
     mWindowWidth = width;
     mWindowHeight = height;
     if ( LoadContent != null )
@@ -77,10 +78,10 @@ public class DrawSurface extends KinDrawTable {
       Looper.prepare();
 
       KinImage mBackground = new KinImage();
-      mBackground.AddImage( R.drawable.menu_bg, -1 );
+      mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
       mBackground.SetPos( 0, 0, mWindowWidth, mWindowHeight );
       KinImage mTitle = new KinImage();
-      mTitle.AddImage( R.drawable.menu_title, -1 );
+      mTitle.AddImage( Main.lib.GetBitmap( R.drawable.menu_title ), -1 );
       mTitle.SetSize( mWindowWidth * 0.95, mWindowHeight * 0.25 );
       mTitle.SetPos( ( mWindowWidth - mTitle.GetWidth() ) / 2, ( mWindowHeight - mTitle.GetHeight() ) / 2 );
 

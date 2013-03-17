@@ -1,18 +1,16 @@
 package tw.ome.drawwithme.widget;
 
-import tw.ome.drawwithme.Main;
-import tw.ome.drawwithme.R;
 import tw.kin.android.KinView;
 import tw.kin.android.widget.KinImage;
+import tw.ome.drawwithme.Main;
+import tw.ome.drawwithme.R;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class CSelectColor extends KinView {
-  boolean visible;
   KinImage mShadow;
   KinImage mSelectors[];
   int mBaseColor[];
@@ -22,26 +20,21 @@ public class CSelectColor extends KinView {
   int mOutR;
   int mInR;
 
-  public boolean IsVisible() {
-    return visible;
-  }
-
   public void Hide() {
-    visible = false;
+    mVisible = false;
     RequireRedraw();
   }
 
   public void Show() {
-    visible = true;
+    mVisible = true;
     RequireRedraw();
   }
 
   @Override
   public void Draw( Canvas canvas ) {
     super.Draw( canvas );
-    if ( !visible )
+    if ( !IsVisible() )
       return;
-    Log.d( "color", "draw" );
     for ( int i = 0; i < 8; i += 1 ) {
       canvas.save();
       canvas.translate( 3, 3 );
@@ -120,7 +113,7 @@ public class CSelectColor extends KinView {
 
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
-    if ( !visible )
+    if ( !IsVisible() )
       return false;
     float x = event.getX();
     float y = event.getY();

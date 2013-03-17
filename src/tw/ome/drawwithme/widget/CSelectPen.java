@@ -16,7 +16,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class CSelectPen extends KinAbsoluteLayout {
-  boolean visible;
   int mSize;
   int mPen;
   KinImage mBackground;
@@ -117,7 +116,7 @@ public class CSelectPen extends KinAbsoluteLayout {
 
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
-    if ( !visible )
+    if ( !IsVisible() )
       return false;
     if ( super.onTouchEvent( event ) )
       return true;
@@ -125,24 +124,20 @@ public class CSelectPen extends KinAbsoluteLayout {
     return true;
   }
 
-  public boolean IsVisible() {
-    return visible;
-  }
-
   public void Hide() {
-    visible = false;
+    mVisible = false;
     RequireRedraw();
   }
 
   public void Show() {
     mSizeBar.SetSeekValue( mSize );
-    visible = true;
+    mVisible = true;
     RequireRedraw();
   }
 
   @Override
   public void Draw( Canvas canvas ) {
-    if ( !visible )
+    if ( !IsVisible() )
       return;
 
     canvas.drawColor( 0xAA000000 );

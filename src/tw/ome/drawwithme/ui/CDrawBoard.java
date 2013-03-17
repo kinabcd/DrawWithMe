@@ -7,6 +7,7 @@ import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
+import tw.ome.drawwithme.protocal.IActionCotroller;
 import tw.ome.drawwithme.widget.CCanvas;
 import tw.ome.drawwithme.widget.CChat;
 import tw.ome.drawwithme.widget.CSelectColor;
@@ -18,9 +19,9 @@ import android.view.KeyEvent;
 
 public class CDrawBoard extends KinAbsoluteLayout implements IUI {
 
-  public CSelectPen mUISelectPen;
-  public CSelectColor mUISelectColor;
-  public CChat mUIChat;
+  CSelectPen mUISelectPen;
+  CSelectColor mUISelectColor;
+  CChat mUIChat;
   CCanvas mUICanvas;
   KinButton mBSelectPen;
   KinButton mBSelectColor;
@@ -30,6 +31,22 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
   KinImage mTopbarBG;
 
   public CDrawBoard() {
+  }
+
+  public void NewCanvas( int width, int height, int bgColor, IActionCotroller mode ) {
+    mUICanvas.New( width, height, bgColor, mode );
+  }
+
+  public int GetPen() {
+    return mUISelectPen.GetPen();
+  }
+
+  public int GetPenSize() {
+    return mUISelectPen.GetSize();
+  }
+
+  public int GetPenColor() {
+    return mUISelectColor.GetColor();
   }
 
   @Override
@@ -93,10 +110,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
 
       @Override
       public void run() {
-        if ( mUIChat.IsVisible() )
-          mUIChat.Hide();
-        else
-          mUIChat.Show();
+        ToggleChat();
       }
     } );
     mTopbarBG = new KinImage();
@@ -157,18 +171,20 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     if ( super.onKeyDown( keycode, event ) )
       return true;
     if ( keycode == KeyEvent.KEYCODE_BACK ) {
+      if ( mUIChat.IsVisible() ) {
+        ToggleChat();
+        return true;
+      }
       AlertDialog.Builder ad = new AlertDialog.Builder( Main.sInstance );
       ad.setTitle( "Quit" );
-      ad.setMessage( "Do you want to save it?" );
+      ad.setMessage( "Do you want to leave?" );
       ad.setNegativeButton( "No", new DialogInterface.OnClickListener() {
         public void onClick( DialogInterface dialog, int which ) {
-          DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
         }
       } );
 
       ad.setPositiveButton( "Yes", new DialogInterface.OnClickListener() {
         public void onClick( DialogInterface dialog, int whichButton ) {
-          mUICanvas.Save();
           DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
         }
       } );
@@ -177,6 +193,23 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
       return true;
     }
     return false;
+  }
 
+  public void ToggleChat() {
+    if ( mUIChat.IsVisible() ) {
+      mUIChat.Hide();
+      mBSelectPen.SetVisible( true );
+      mBSelectColor.SetVisible( true );
+      mBCamera.SetVisible( true );
+      mBSetting.SetVisible( true );
+      mBChat.SetVisible( true );
+    } else {
+      mUIChat.Show();
+      mBSelectPen.SetVisible( false );
+      mBSelectColor.SetVisible( false );
+      mBCamera.SetVisible( false );
+      mBSetting.SetVisible( false );
+      mBChat.SetVisible( false );
+    }
   }
 }

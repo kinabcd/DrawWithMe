@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import tw.kin.android.KinPoint;
+import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -535,31 +536,38 @@ public class CModeInternet implements IActionCotroller {
         }
         int result = ReadInt();
         int id = ReadInt();
-        if ( result == 0 )
+        if ( result == 0 ) {
           Log.i( "0x25_0", "Create Success!" );
-        else if ( result == 1 )
+          JoinRoom( id, "" );
+        } else if ( result == 1 )
           Log.i( "0x25_1", "Room Name Error!" );
         else if ( result == 2 )
           Log.i( "0x25_2", "Room Password Error!" );
         else if ( result == 9 )
           Log.i( "0x25_9", "Not Login!" );
-        JoinRoom( id, "" );
 
         return true;
       } else if ( head == 0x26 ) { // 加入房間結果
-        if ( bufferLen < 5 ) {
+        if ( bufferLen < 17 ) {
           Log.i( "0x26", "BufferLen Error" );
           return false;
         }
         int result = ReadInt();
-        if ( result == 0 )
+        int width = ReadInt();
+        int height = ReadInt();
+        int color = ReadInt();
+        if ( result == 0 ) {
           Log.i( "0x26_0", "Join Success!" );
-        else if ( result == 1 )
+          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, CModeInternet.GetClient() );
+          DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
+        } else if ( result == 1 )
           Log.i( "0x26_1", "Password Error!" );
         else if ( result == 2 )
           Log.i( "0x26_2", "Room is Full!" );
         else if ( result == 3 )
           Log.i( "0x26_3", "You were Banned!" );
+        else if ( result == 4 )
+          Log.i( "0x26_4", "Without Room!" );
         else if ( result == 9 )
           Log.i( "0x26_9", "Not Login!" );
 
@@ -577,13 +585,15 @@ public class CModeInternet implements IActionCotroller {
         for ( int i = 0; i < num; i += 1 ) {
           int roomNum = ReadInt();
           String roomName = ReadString( 32 );
+          int peopleNum = ReadInt();
           int locked = ReadByte();
-          int peopleNum = ReadByte();
+          DrawSurface.GetInstance().mUIMenu.AddRoom( roomNum, roomName, locked != 0, peopleNum );
           // 儲存 ?
         }
         // 顯示?
         // DrawSurface.GetInstance().RequireRedraw();
         Log.i( "0x27", "Receive " + Integer.toString( num ) + " search results!" );
+        DrawSurface.GetInstance().RequireRedraw();
         return true;
       } else if ( head == 0x28 ) { // 筆劃開始
         if ( bufferLen < 17 ) {

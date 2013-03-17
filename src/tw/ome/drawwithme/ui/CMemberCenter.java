@@ -26,18 +26,15 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
   KinButton mBOK;
 
   public CMemberCenter() {
-    // TODO Auto-generated constructor stub
   }
 
   @Override
   public void onStart( IUI from ) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void onQuit( IUI to ) {
-    // TODO Auto-generated method stub
 
   }
 

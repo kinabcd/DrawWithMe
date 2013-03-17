@@ -62,7 +62,15 @@ public class CNew extends KinAbsoluteLayout implements IUI {
           Toast.makeText( Main.sInstance, "Create Fail!!", Toast.LENGTH_SHORT ).show();
           return;
         }
-        DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
+        int width = mSizeBarX.GetSeekValue();
+        int height = mSizeBarY.GetSeekValue();
+        int color = mUISelectColor.GetColor();
+        if ( !mIsOnline ) {
+          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, new CModeSingle() );
+          DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
+        } else {
+          CModeInternet.CreateRoom( width, height, color, mRoomName.GetText(), mRoomPassword.GetText() );
+        }
       }
     } );
     KinImage iDefaultSize = new KinImage();
@@ -113,6 +121,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mRoomName = new KinLable();
     // mRoomName.SetText( "NAME" );
     mBRoomName = new KinButton();
+    mBRoomName.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
     mBRoomName.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
@@ -140,6 +149,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mRoomPassword = new KinLable();
     // mRoomPassword.SetText( "PASSWORD" );
     mBRoomPassword = new KinButton();
+    mBRoomPassword.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
     mBRoomPassword.SetOnClickRun( new Runnable() {
       @Override
       public void run() {
@@ -172,10 +182,10 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     AddChild( mBReset );
     AddChild( mBSelectColor );
     AddChild( mBCheckOnline );
-    AddChild( mRoomName );
-    AddChild( mRoomPassword );
     AddChild( mBRoomName );
     AddChild( mBRoomPassword );
+    AddChild( mRoomName );
+    AddChild( mRoomPassword );
     AddChild( mUISelectSize );
     AddChild( mUISelectColor );
   }
@@ -231,15 +241,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
 
   @Override
   public void onQuit( IUI to ) {
-    if ( to instanceof CDrawBoard ) {
-      CDrawBoard canvas = (CDrawBoard) to;
-      int width = mSizeBarX.GetSeekValue();
-      int height = mSizeBarY.GetSeekValue();
-      int color = mUISelectColor.GetColor();
-      if ( mIsOnline )
-        canvas.mUICanvas.New( width, height, color, CModeInternet.GetClient() );
-      else
-        canvas.mUICanvas.New( width, height, color, new CModeSingle() );
+    if ( to instanceof CDrawBoard && !mIsOnline ) {
     }
 
   }

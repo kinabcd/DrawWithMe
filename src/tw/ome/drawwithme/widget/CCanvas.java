@@ -14,9 +14,6 @@ import tw.ome.drawwithme.protocal.IActionCotroller;
 import tw.ome.drawwithme.ui.CDrawBoard;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.os.Environment;
 import android.view.MotionEvent;
@@ -32,7 +29,7 @@ public class CCanvas extends KinAbsoluteLayout {
   Canvas mCanvas;
   int mBackgroundColor;
   Action mNewAction;
-  String pc;
+  // String pc;
   KinPoint mDownCenterPoint;
   double mDownLength;
   double mViewScaleRateOld;
@@ -71,9 +68,9 @@ public class CCanvas extends KinAbsoluteLayout {
       mDownCenterPoint = null;
     } else if ( mode == MODE.DRAW ) {
       KinPoint screenPoint = new KinPoint( event.getX(), event.getY() );
-      int pen = ( (CDrawBoard) GetParent() ).mUISelectPen.GetPen();
-      int color = ( (CDrawBoard) GetParent() ).mUISelectColor.GetColor();
-      int size = ( (CDrawBoard) GetParent() ).mUISelectPen.GetSize();
+      int pen = ( (CDrawBoard) GetParent() ).GetPen();
+      int color = ( (CDrawBoard) GetParent() ).GetPenColor();
+      int size = ( (CDrawBoard) GetParent() ).GetPenSize();
       if ( pen == CConstant.PENERASER )
         color = mBackgroundColor;
       mNewAction = new Action( pen, color, size );
@@ -116,14 +113,12 @@ public class CCanvas extends KinAbsoluteLayout {
 
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
+    if ( !IsVisible() )
+      return false;
     if ( super.onTouchEvent( event ) )
       return true;
     if ( event.getPointerCount() > 2 )
       return false;
-    pc = mTouchMode.toString() + " " + event.getPointerCount() + "\n";
-    pc += event.getAction();
-    for ( int i = 0; i < event.getPointerCount(); i += 1 )
-      pc += "(" + event.getX( i ) + "," + event.getY( i ) + ")";
 
     if ( event.getAction() == MotionEvent.ACTION_CANCEL ) // 第三指下
       ChangeMode( MODE.WAIT, event );
@@ -185,6 +180,8 @@ public class CCanvas extends KinAbsoluteLayout {
 
   @Override
   public void Draw( Canvas canvas ) {
+    if ( !IsVisible() )
+      return;
     canvas.save();
     canvas.clipRect( GetViewRect() );
     canvas.drawColor( 0xff888888 );
@@ -195,10 +192,6 @@ public class CCanvas extends KinAbsoluteLayout {
     for ( Action a : actions )
       a.Draw( mCanvas );
     canvas.drawBitmap( mBitmap, mViewRect, GetViewRect(), null );
-    Paint m = new Paint();
-    m.setColor( Color.BLACK );
-    m.setStyle( Style.FILL );
-    canvas.drawText( "" + pc, 0, 100, m );
     super.Draw( canvas );
     canvas.restore();
 

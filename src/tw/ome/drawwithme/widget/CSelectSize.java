@@ -42,6 +42,8 @@ public class CSelectSize extends KinView {
 
   @Override
   public void Draw( Canvas canvas ) {
+    if ( !IsVisible() )
+      return;
     canvas.drawRect( GetViewRect(), mMaxCPaint );
     mC.left = GetX();
     mC.bottom = GetY() + GetHeight();

@@ -5,14 +5,11 @@ import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinEditText;
 import tw.kin.android.widget.KinImage;
 import tw.kin.android.widget.KinLable;
+import tw.kin.android.widget.KinScroll;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
-import android.graphics.Canvas;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 
 public class CChat extends KinAbsoluteLayout {
-  KinImage mBackground;
 
   KinLable mRoomNumber;
   KinImage mRoomOnlock;
@@ -27,7 +24,7 @@ public class CChat extends KinAbsoluteLayout {
 
   KinImage mListRoommate;
   KinImage mListFriend;
-  KinImage mListMessage;
+  KinScroll mListMessage;
 
   KinImage mBottomBackground;
   KinButton mBSmile;// 表情符號
@@ -36,11 +33,9 @@ public class CChat extends KinAbsoluteLayout {
   KinButton mBSend;
 
   public CChat() {
-    mBackground = new KinImage();
-    mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
-
+    this.SetBackground( 0x80ffffff );
     mRoomNumber = new KinLable();
-    mRoomNumber.SetText( "0" );
+    mRoomNumber.SetText( "No.999" );
     mRoomOnlock = new KinImage();
     mRoomOnlock.AddImage( Main.lib.GetBitmap( R.drawable.chat_lock ), -1 );
     mRoomName = new KinLable();
@@ -89,8 +84,8 @@ public class CChat extends KinAbsoluteLayout {
     mListFriend = new KinImage();
     mListFriend.AddImage( Main.lib.GetBitmap( R.drawable.chat_friend_page ), -1 );
 
-    mListMessage = new KinImage();
-    mListMessage.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
+    mListMessage = new KinScroll();
+    mListMessage.SetBackground( 0x99ffffff );
     mBottomBackground = new KinImage();
     mBottomBackground.AddImage( Main.lib.GetBitmap( R.drawable.chat_bottombg ), -1 );
 
@@ -106,10 +101,6 @@ public class CChat extends KinAbsoluteLayout {
     iSend.AddImage( Main.lib.GetBitmap( R.drawable.chat_send_disable ), -1 );
     mBSend = new KinButton( iSend );
 
-    AddChild( mBackground );
-    AddChild( mRoomNumber );
-    AddChild( mRoomOnlock );
-    AddChild( mRoomName );
     AddChild( mPageRoommateUp );
     AddChild( mPageFriendUp );
     AddChild( mPageHideUp );
@@ -124,21 +115,9 @@ public class CChat extends KinAbsoluteLayout {
     AddChild( mInputBg );
     AddChild( mInputMessage );
     AddChild( mBSend );
-
-  }
-
-  @Override
-  public boolean onTouchEvent( MotionEvent event ) {
-    if ( !mVisible )
-      return false;
-    if ( super.onTouchEvent( event ) )
-      return true;
-
-    return true;
-  }
-
-  public boolean IsVisible() {
-    return mVisible;
+    AddChild( mRoomNumber );
+    AddChild( mRoomOnlock );
+    AddChild( mRoomName );
   }
 
   public void Hide() {
@@ -152,46 +131,35 @@ public class CChat extends KinAbsoluteLayout {
     RequireRedraw();
   }
 
-  @Override
-  public void Draw( Canvas canvas ) {
-    if ( !mVisible )
-      return;
-
-    // canvas.drawColor( 0xAA000000 );
-
-    super.Draw( canvas );
-  }
-
   public void CompatibleWith( double windowWidth, double windowHeight ) {
-    mBackground.SetSize( windowWidth, windowHeight ); // 設定背景大小
-    mBackground.SetPos( 0, 0 );
-
-    mRoomNumber.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.1 ) );
-    mRoomNumber.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.05 ) );
-    mRoomOnlock.SetSize( (int) ( windowWidth / 12 ), (int) ( windowWidth * 0.1 ) );
-    mRoomOnlock.SetPos( (int) ( windowWidth * 0.175 ), (int) ( windowWidth * 0.05 ) );
-    mRoomName.SetSize( (int) ( windowWidth * 0.7 ), (int) ( windowWidth * 0.1 ) );
-    mRoomName.SetPos( (int) ( windowWidth * 0.25 ), (int) ( windowWidth * 0.05 ) );
+    SetSize( windowWidth, windowHeight );
 
     mBPageRoommate.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mBPageRoommate.SetPos( (int) ( windowWidth * 0.35 ), (int) ( windowWidth * 0.175 ) );
+    mBPageRoommate.SetPos( (int) ( windowWidth * 0.05 ), 0 );
     mPageRoommateUp.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mPageRoommateUp.SetPos( (int) ( windowWidth * 0.35 ), (int) ( windowWidth * 0.175 ) );
+    mPageRoommateUp.SetPos( (int) ( windowWidth * 0.05 ), 0 );
     mBPageFriend.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mBPageFriend.SetPos( (int) ( windowWidth * 0.55 ), (int) ( windowWidth * 0.175 ) );
+    mBPageFriend.SetPos( (int) ( windowWidth * 0.25 ), 0 );
     mPageFriendUp.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mPageFriendUp.SetPos( (int) ( windowWidth * 0.55 ), (int) ( windowWidth * 0.175 ) );
+    mPageFriendUp.SetPos( (int) ( windowWidth * 0.25 ), 0 );
     mBPageHide.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mBPageHide.SetPos( (int) ( windowWidth * 0.75 ), (int) ( windowWidth * 0.175 ) );
+    mBPageHide.SetPos( (int) ( windowWidth * 0.45 ), 0 );
     mPageHideUp.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.125 ) );
-    mPageHideUp.SetPos( (int) ( windowWidth * 0.75 ), (int) ( windowWidth * 0.175 ) );
+    mPageHideUp.SetPos( (int) ( windowWidth * 0.45 ), 0 );
 
     mListRoommate.SetSize( (int) ( windowWidth * 0.6 ), (int) ( windowWidth * 1 ) );
-    mListRoommate.SetPos( (int) ( windowWidth * 0.35 ), (int) ( windowWidth * 0.3 ) );
+    mListRoommate.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.125 ) );
     mListFriend.SetSize( (int) ( windowWidth * 0.6 ), (int) ( windowWidth * 1 ) );
-    mListFriend.SetPos( (int) ( windowWidth * 0.35 ), (int) ( windowWidth * 0.3 ) );
+    mListFriend.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.125 ) );
 
-    mListMessage.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 0.95 ),
+    mRoomNumber.SetSize( (int) ( windowWidth * 0.2 ), (int) ( windowWidth * 0.1 ) );
+    mRoomNumber.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.125 ) );
+    mRoomOnlock.SetSize( (int) ( windowWidth / 12 ), (int) ( windowWidth * 0.1 ) );
+    mRoomOnlock.SetPos( (int) ( windowWidth * 0.55 ), (int) ( windowWidth * 0.125 ) );
+    mRoomName.SetSize( (int) ( windowWidth * 0.6 ), (int) ( windowWidth * 0.1 ) );
+    mRoomName.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.225 ) );
+
+    mListMessage.SetPos( (int) ( windowWidth * 0.05 ), (int) ( windowWidth * 0.125 ), (int) ( windowWidth * 0.95 ),
         (int) ( windowHeight - windowWidth * 0.15 ) );
 
     mBottomBackground.SetSize( (int) ( windowWidth * 0.9 ), (int) ( windowWidth * 0.125 ) );
@@ -219,6 +187,9 @@ public class CChat extends KinAbsoluteLayout {
       mPageHideUp.SetVisible( false );
       mListFriend.SetVisible( false );
       mListRoommate.SetVisible( true );
+      mRoomNumber.SetVisible( true );
+      mRoomOnlock.SetVisible( true );
+      mRoomName.SetVisible( true );
     } else if ( page == 2 ) {
       mBPageRoommate.SetVisible( true );
       mPageRoommateUp.SetVisible( false );
@@ -228,6 +199,9 @@ public class CChat extends KinAbsoluteLayout {
       mPageHideUp.SetVisible( false );
       mListRoommate.SetVisible( false );
       mListFriend.SetVisible( true );
+      mRoomNumber.SetVisible( false );
+      mRoomOnlock.SetVisible( false );
+      mRoomName.SetVisible( false );
     } else {
       mBPageRoommate.SetVisible( true );
       mPageRoommateUp.SetVisible( false );
@@ -237,18 +211,11 @@ public class CChat extends KinAbsoluteLayout {
       mPageHideUp.SetVisible( true );
       mListRoommate.SetVisible( false );
       mListFriend.SetVisible( false );
+      mRoomNumber.SetVisible( false );
+      mRoomOnlock.SetVisible( false );
+      mRoomName.SetVisible( false );
     }
     RequireRedraw();
   }
 
-  @Override
-  public boolean onKeyDown( int keycode, KeyEvent event ) {
-    if ( !IsVisible() )
-      return false;
-    if ( keycode == KeyEvent.KEYCODE_BACK ) {
-      Hide();
-      return true;
-    }
-    return false;
-  }
 }

@@ -36,7 +36,7 @@ public class CSelectPen extends KinAbsoluteLayout {
     mCancel = new KinImage();
     mCancel.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_cancel ), -1 );
     mBCancel = new KinButton( mCancel );
-    mBCancel.SetOnClickRun( new Runnable() {
+    mBCancel.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         Hide();
@@ -55,7 +55,7 @@ public class CSelectPen extends KinAbsoluteLayout {
     mPenType[5].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_lock ), -1 );
 
     mB_Normal = new KinButton( mPenType[0] ); // 一般畫筆
-    mB_Normal.SetOnClickRun( new Runnable() {
+    mB_Normal.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mPen = CConstant.PENNORMAL;
@@ -64,7 +64,7 @@ public class CSelectPen extends KinAbsoluteLayout {
       }
     } );
     mB_Eraser = new KinButton( mPenType[1] ); // 橡皮擦
-    mB_Eraser.SetOnClickRun( new Runnable() {
+    mB_Eraser.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mPen = CConstant.PENERASER;
@@ -73,7 +73,7 @@ public class CSelectPen extends KinAbsoluteLayout {
       }
     } );
     mB_Highlighter = new KinButton( mPenType[2] ); // 螢光筆
-    mB_Highlighter.SetOnClickRun( new Runnable() {
+    mB_Highlighter.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mPen = CConstant.PENHIGHLIGHTER;
@@ -82,7 +82,7 @@ public class CSelectPen extends KinAbsoluteLayout {
       }
     } );
     mB_Watercolor = new KinButton( mPenType[3] ); // 水彩
-    mB_Watercolor.SetOnClickRun( new Runnable() {
+    mB_Watercolor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mPen = CConstant.PENWATERCOLOR;
@@ -91,7 +91,7 @@ public class CSelectPen extends KinAbsoluteLayout {
       }
     } );
     mB_Neon = new KinButton( mPenType[4] ); // 霓虹
-    mB_Neon.SetOnClickRun( new Runnable() {
+    mB_Neon.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mPen = CConstant.PENNEON;

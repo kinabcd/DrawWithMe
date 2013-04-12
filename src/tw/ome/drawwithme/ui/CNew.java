@@ -1,30 +1,22 @@
 package tw.ome.drawwithme.ui;
 
-import tw.ome.drawwithme.R;
 import tw.kin.android.layout.KinAbsoluteLayout;
 import tw.kin.android.widget.KinButton;
+import tw.kin.android.widget.KinEditText;
 import tw.kin.android.widget.KinImage;
-import tw.kin.android.widget.KinLable;
 import tw.kin.android.widget.KinSeekBar;
 import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
 import tw.ome.drawwithme.Main;
+import tw.ome.drawwithme.R;
 import tw.ome.drawwithme.protocal.CModeInternet;
-import tw.ome.drawwithme.protocal.CModeSingle;
 import tw.ome.drawwithme.widget.CSelectColor;
 import tw.ome.drawwithme.widget.CSelectSize;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.Paint.Style;
-import android.text.InputFilter;
-import android.text.InputType;
 import android.view.KeyEvent;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class CNew extends KinAbsoluteLayout implements IUI {
@@ -33,10 +25,10 @@ public class CNew extends KinAbsoluteLayout implements IUI {
   KinButton mBReset;
   KinButton mBSelectColor;
   KinButton mBCheckOnline;
-  KinLable mRoomName;
-  KinLable mRoomPassword;
-  KinButton mBRoomName;
-  KinButton mBRoomPassword;
+  KinEditText mRoomName;
+  KinEditText mRoomPassword;
+  KinImage mIRoomName;
+  KinImage mIRoomPassword;
   KinSeekBar mSizeBarX;
   KinSeekBar mSizeBarY;
   CSelectSize mUISelectSize;
@@ -55,7 +47,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
     mBOK = new KinButton( iOK );
     SetAlignment( mBOK, Alignment.RIGHT, Alignment.BOTTOM );
-    mBOK.SetOnClickRun( new Runnable() {
+    mBOK.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         if ( mSizeBarX.GetSeekValue() < 1 || mSizeBarY.GetSeekValue() < 1 ) {
@@ -66,7 +58,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
         int height = mSizeBarY.GetSeekValue();
         int color = mUISelectColor.GetColor();
         if ( !mIsOnline ) {
-          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, new CModeSingle() );
+          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, false );
           DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
         } else {
           CModeInternet.CreateRoom( width, height, color, mRoomName.GetText(), mRoomPassword.GetText() );
@@ -76,7 +68,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     KinImage iDefaultSize = new KinImage();
     iDefaultSize.AddImage( Main.lib.GetBitmap( R.drawable.new_select_bg ), -1 );
     mBSelectColor = new KinButton( iDefaultSize );
-    mBSelectColor.SetOnClickRun( new Runnable() {
+    mBSelectColor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mUISelectColor.Show();
@@ -86,7 +78,7 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     iReset.AddImage( Main.lib.GetBitmap( R.drawable.new_reset ), -1 );
     mBReset = new KinButton( iReset );
     SetAlignment( mBReset, Alignment.LEFT, Alignment.BOTTOM );
-    mBReset.SetOnClickRun( new Runnable() {
+    mBReset.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         mSizeBarX.SetSeekValue( GetWidth() );
@@ -112,68 +104,29 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mBCheckOnline = new KinButton();
     mBCheckOnline.AddImage( Main.lib.GetBitmap( R.drawable.online ), -1 );
     mBCheckOnline.AddImage( Main.lib.GetBitmap( R.drawable.offline ), -1 );
-    mBCheckOnline.SetOnClickRun( new Runnable() {
+    mBCheckOnline.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         SetOnline( !mIsOnline );
+        mBCheckOnline.SetFrame( 0 );
       }
     } );
-    mRoomName = new KinLable();
-    // mRoomName.SetText( "NAME" );
-    mBRoomName = new KinButton();
-    mBRoomName.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
-    mBRoomName.SetOnClickRun( new Runnable() {
+    mBCheckOnline.SetOnDownRun( new Runnable() {
       @Override
       public void run() {
-        AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
-        builder.setTitle( "RoomName" );
-        final LinearLayout view = new LinearLayout( Main.sInstance );
-        view.setOrientation( LinearLayout.VERTICAL );
-        final EditText inputRoomName = new EditText( Main.sInstance );
-        inputRoomName.setText( mRoomName.GetText() );
-        inputRoomName.setHint( "Room Name" );
-        inputRoomName.setInputType( InputType.TYPE_CLASS_TEXT );
-        inputRoomName.setTypeface( Typeface.SERIF );
-        view.addView( inputRoomName );
-        builder.setView( view );
-        builder.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick( DialogInterface dialog, int which ) {
-            mRoomName.SetText( inputRoomName.getText().toString() );
-          }
-        } );
-        builder.show();
-      }
-    } );
+        mBCheckOnline.SetFrame( 1 );
 
-    mRoomPassword = new KinLable();
-    // mRoomPassword.SetText( "PASSWORD" );
-    mBRoomPassword = new KinButton();
-    mBRoomPassword.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
-    mBRoomPassword.SetOnClickRun( new Runnable() {
-      @Override
-      public void run() {
-        AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
-        builder.setTitle( "RoomPassword" );
-        final LinearLayout view = new LinearLayout( Main.sInstance );
-        view.setOrientation( LinearLayout.VERTICAL );
-        final EditText inputRoomPassword = new EditText( Main.sInstance );
-        inputRoomPassword.setText( mRoomPassword.GetText() );
-        inputRoomPassword.setHint( "Number Only" );
-        inputRoomPassword.setInputType( InputType.TYPE_CLASS_NUMBER );
-        inputRoomPassword.setTypeface( Typeface.SERIF );
-        inputRoomPassword.setFilters( new InputFilter[] { CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter( 16 ) } );
-        view.addView( inputRoomPassword );
-        builder.setView( view );
-        builder.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick( DialogInterface dialog, int which ) {
-            mRoomPassword.SetText( inputRoomPassword.getText().toString() );
-          }
-        } );
-        builder.show();
       }
     } );
+    mRoomName = new KinEditText();
+    // mRoomName.SetText( "NAME" );
+    mIRoomName = new KinImage();
+    mIRoomName.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
+
+    mRoomPassword = new KinEditText();
+    mIRoomPassword = new KinImage();
+    mIRoomPassword.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
+    // mRoomPassword.SetText( "PASSWORD" );
 
     AddChild( mBackground );
     AddChild( mSizeBarX );
@@ -182,8 +135,8 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     AddChild( mBReset );
     AddChild( mBSelectColor );
     AddChild( mBCheckOnline );
-    AddChild( mBRoomName );
-    AddChild( mBRoomPassword );
+    AddChild( mIRoomName );
+    AddChild( mIRoomPassword );
     AddChild( mRoomName );
     AddChild( mRoomPassword );
     AddChild( mUISelectSize );
@@ -222,10 +175,10 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mRoomName.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth ) );
     mRoomPassword.SetSize( windowWidth * 0.65, windowWidth * 0.125 );
     mRoomPassword.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 1.15 ) );
-    mBRoomName.SetSize( windowWidth * 0.65, windowWidth * 0.125 );
-    mBRoomName.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth ) );
-    mBRoomPassword.SetSize( windowWidth * 0.65, windowWidth * 0.125 );
-    mBRoomPassword.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 1.15 ) );
+    mIRoomName.SetSize( windowWidth * 0.7, windowWidth * 0.125 );
+    mIRoomName.SetPos( (int) ( windowWidth * 0.28 ), (int) ( windowWidth ) );
+    mIRoomPassword.SetSize( windowWidth * 0.7, windowWidth * 0.125 );
+    mIRoomPassword.SetPos( (int) ( windowWidth * 0.28 ), (int) ( windowWidth * 1.15 ) );
 
     mUISelectColor.CompatibleWith( windowWidth, windowHeight );
   }
@@ -263,14 +216,14 @@ public class CNew extends KinAbsoluteLayout implements IUI {
       mBCheckOnline.SetFrame( 0 );
       mRoomName.SetVisible( true );
       mRoomPassword.SetVisible( true );
-      mBRoomName.SetVisible( true );
-      mBRoomPassword.SetVisible( true );
+      mIRoomName.SetVisible( true );
+      mIRoomPassword.SetVisible( true );
     } else {
       mBCheckOnline.SetFrame( 1 );
       mRoomName.SetVisible( false );
       mRoomPassword.SetVisible( false );
-      mBRoomName.SetVisible( false );
-      mBRoomPassword.SetVisible( false );
+      mIRoomName.SetVisible( false );
+      mIRoomPassword.SetVisible( false );
     }
     RequireRedraw();
   }

@@ -558,7 +558,7 @@ public class CModeInternet implements IActionCotroller {
         int color = ReadInt();
         if ( result == 0 ) {
           Log.i( "0x26_0", "Join Success!" );
-          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, CModeInternet.GetClient() );
+          DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, true );
           DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
         } else if ( result == 1 )
           Log.i( "0x26_1", "Password Error!" );

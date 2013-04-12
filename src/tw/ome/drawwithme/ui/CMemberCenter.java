@@ -58,7 +58,7 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     KinImage iLogout = new KinImage();
     iLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout ), -1 );
     mBLogout = new KinButton( iLogout );
-    mBLogout.SetOnClickRun( new Runnable() {
+    mBLogout.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         CModeInternet.Logout();
@@ -77,7 +77,7 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
     mBOK = new KinButton( iOK );
     SetAlignment( mBOK, Alignment.CENTER, Alignment.BOTTOM );
-    mBOK.SetOnClickRun( new Runnable() {
+    mBOK.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );

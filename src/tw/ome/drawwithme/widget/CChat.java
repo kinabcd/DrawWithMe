@@ -46,10 +46,9 @@ public class CChat extends KinAbsoluteLayout {
     KinImage iPageRoommateDown = new KinImage();
     iPageRoommateDown.AddImage( Main.lib.GetBitmap( R.drawable.chat_roommate_down ), -1 );
     mBPageRoommate = new KinButton( iPageRoommateDown );
-    mBPageRoommate.SetOnClickRun( new Runnable() {
+    mBPageRoommate.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
-        // TODO show roommate list
         SetPage( 1 );
       }
     } );
@@ -59,10 +58,9 @@ public class CChat extends KinAbsoluteLayout {
     KinImage iPageFriendDown = new KinImage();
     iPageFriendDown.AddImage( Main.lib.GetBitmap( R.drawable.chat_friend_down ), -1 );
     mBPageFriend = new KinButton( iPageFriendDown );
-    mBPageFriend.SetOnClickRun( new Runnable() {
+    mBPageFriend.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
-        // TODO show friend list
         SetPage( 2 );
       }
     } );
@@ -71,10 +69,9 @@ public class CChat extends KinAbsoluteLayout {
     KinImage iPageHide = new KinImage();
     iPageHide.AddImage( Main.lib.GetBitmap( R.drawable.chat_hide_down ), -1 );
     mBPageHide = new KinButton( iPageHide );
-    mBPageHide.SetOnClickRun( new Runnable() {
+    mBPageHide.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
-        // TODO hide roommate/friend list
         SetPage( 3 );
       }
     } );

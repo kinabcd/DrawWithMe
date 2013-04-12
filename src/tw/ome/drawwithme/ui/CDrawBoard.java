@@ -7,6 +7,8 @@ import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
+import tw.ome.drawwithme.protocal.CModeInternet;
+import tw.ome.drawwithme.protocal.CModeSingle;
 import tw.ome.drawwithme.protocal.IActionCotroller;
 import tw.ome.drawwithme.widget.CCanvas;
 import tw.ome.drawwithme.widget.CChat;
@@ -33,7 +35,12 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
   public CDrawBoard() {
   }
 
-  public void NewCanvas( int width, int height, int bgColor, IActionCotroller mode ) {
+  public void NewCanvas( int width, int height, int bgColor, boolean internet ) {
+    IActionCotroller mode;
+    if ( internet )
+      mode = CModeInternet.GetClient();
+    else
+      mode = new CModeSingle();
     mUICanvas.New( width, height, bgColor, mode );
   }
 
@@ -58,7 +65,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     KinImage imgSelectPen = new KinImage();
     imgSelectPen.AddImage( Main.lib.GetBitmap( R.drawable.board_selectpen ), -1 );
     mBSelectPen = new KinButton( imgSelectPen );
-    mBSelectPen.SetOnClickRun( new Runnable() {
+    mBSelectPen.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         if ( mUISelectPen.IsVisible() )
@@ -71,7 +78,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     KinImage imgSelectColor = new KinImage();
     imgSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.board_selectcolor ), -1 );
     mBSelectColor = new KinButton( imgSelectColor );
-    mBSelectColor.SetOnClickRun( new Runnable() {
+    mBSelectColor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         if ( mUISelectColor.IsVisible() )
@@ -84,7 +91,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     KinImage imgCamera = new KinImage();
     imgCamera.AddImage( Main.lib.GetBitmap( R.drawable.board_camera ), -1 );
     mBCamera = new KinButton( imgCamera );
-    mBCamera.SetOnClickRun( new Runnable() {
+    mBCamera.SetOnUpRun( new Runnable() {
 
       @Override
       public void run() {
@@ -96,7 +103,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     KinImage imgSetting = new KinImage();
     imgSetting.AddImage( Main.lib.GetBitmap( R.drawable.board_setting ), -1 );
     mBSetting = new KinButton( imgSetting );
-    mBSetting.SetOnClickRun( new Runnable() {
+    mBSetting.SetOnUpRun( new Runnable() {
 
       @Override
       public void run() {
@@ -106,7 +113,7 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     KinImage imgDialogBox = new KinImage();
     imgDialogBox.AddImage( Main.lib.GetBitmap( R.drawable.board_dialogbox ), -1 );
     mBChat = new KinButton( imgDialogBox );
-    mBChat.SetOnClickRun( new Runnable() {
+    mBChat.SetOnUpRun( new Runnable() {
 
       @Override
       public void run() {

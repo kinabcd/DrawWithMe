@@ -36,7 +36,7 @@ public class Main extends Activity {
     //getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
     requestWindowFeature( Window.FEATURE_NO_TITLE ); // 設定成No title
     lib.SetContext( this );
-    getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN );
+   // getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN );
     if ( sInstance != null ) {
       ViewGroup vg = (ViewGroup) ( DrawSurface.GetInstance().getParent() );
       if ( vg != null )

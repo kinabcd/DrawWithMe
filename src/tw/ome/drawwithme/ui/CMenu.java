@@ -11,6 +11,7 @@ import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 import tw.ome.drawwithme.protocal.CModeInternet;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.text.InputFilter;
@@ -18,6 +19,7 @@ import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -53,7 +55,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       mLableNum.SetTextColor( 0xff000088 );
       mLableNum.SetBold( true );
       mButton.SetSizePercent( 1, 1 );
-      mButton.SetOnClickRun( new Runnable() {
+      mButton.SetOnUpRun( new Runnable() {
         @Override
         public void run() {
           AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
@@ -132,7 +134,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     KinImage iRefresh = new KinImage();
     iRefresh.AddImage( Main.lib.GetBitmap( R.drawable.menu_refresh ), -1 );
     mBRefresh = new KinButton( iRefresh );
-    mBRefresh.SetOnClickRun( new Runnable() {
+    mBRefresh.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         // TODO refresh menu
@@ -144,7 +146,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     KinImage iSearch = new KinImage();
     iSearch.AddImage( Main.lib.GetBitmap( R.drawable.menu_search ), -1 );
     mBSearch = new KinButton( iSearch );
-    mBSearch.SetOnClickRun( new Runnable() {
+    mBSearch.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
@@ -184,15 +186,19 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
             }
 
             mLastSearchStr = inputKeyword.getText().toString();
+            InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+            imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
           }
         } );
         builder.show();
+        InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+        imm.toggleSoftInput( InputMethodManager.SHOW_FORCED, 0 ); // show keyboard
       }
     } );
     KinImage iSetting = new KinImage();
     iSetting.AddImage( Main.lib.GetBitmap( R.drawable.menu_setting ), -1 );
     mBSetting = new KinButton( iSetting );
-    mBSetting.SetOnClickRun( new Runnable() {
+    mBSetting.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         if ( CModeInternet.IsLogin() )
@@ -202,7 +208,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     KinImage iCreate = new KinImage();
     iCreate.AddImage( Main.lib.GetBitmap( R.drawable.menu_create ), -1 );
     mBCreate = new KinButton( iCreate );
-    mBCreate.SetOnClickRun( new Runnable() {
+    mBCreate.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
@@ -211,7 +217,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     KinImage iLogin = new KinImage();
     iLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login ), -1 );
     mBLogin = new KinButton( iLogin );
-    mBLogin.SetOnClickRun( new Runnable() {
+    mBLogin.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
         AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
@@ -245,6 +251,8 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
             CModeInternet.Search( 0x03, "" );
             mLastSearch = 0x03;
             mLastSearchStr = new String( "" );
+            InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+            imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
           }
         } );
         builder.setNeutralButton( "Register", new DialogInterface.OnClickListener() {
@@ -278,12 +286,18 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
                   CModeInternet.Register( account, nickname, password );
                 else
                   ;// TODO show confirm error
+
+                InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+                imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
               }
             } );
             builder.show();
           }
         } );
         builder.show();
+
+        InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+        imm.toggleSoftInput( InputMethodManager.SHOW_FORCED, 0 ); // show keyboard
       }
     } );
     mButtonBar = new KinAbsoluteLayout();
@@ -336,4 +350,5 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     }
     return super.onKeyDown( keycode, event );
   }
+
 }

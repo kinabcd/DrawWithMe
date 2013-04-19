@@ -20,7 +20,6 @@ public class CSelectPen extends KinAbsoluteLayout {
   int mPen;
   KinImage mBackground;
   KinButton mBCancel;
-  KinImage mCancel;
   KinImage mPenType[];
   KinButton mB_Normal;
   KinButton mB_Eraser;
@@ -33,73 +32,135 @@ public class CSelectPen extends KinAbsoluteLayout {
 
   public CSelectPen() {
     mBackground = new KinImage();
-    mCancel = new KinImage();
-    mCancel.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_cancel ), -1 );
-    mBCancel = new KinButton( mCancel );
+
+    mBCancel = new KinButton();
+    mBCancel.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_cancel ), -1 );
+    mBCancel.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_cancel2 ), -1 );
     mBCancel.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBCancel.SetFrame( 0 );
         Hide();
       }
     } );
+    mBCancel.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBCancel.SetFrame( 1 );
+      }
+    } );
 
-    mPenType = new KinImage[6];
-    for ( int i = 0; i < 6; i += 1 )
-      mPenType[i] = new KinImage();
-
-    mPenType[0].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_normal ), -1 );
-    mPenType[1].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_eraser ), -1 );
-    mPenType[2].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_highlighter ), -1 );
-    mPenType[3].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_watercolor ), -1 );
-    mPenType[4].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_neon ), -1 );
-    mPenType[5].AddImage( Main.lib.GetBitmap( R.drawable.selectpen_lock ), -1 );
-
-    mB_Normal = new KinButton( mPenType[0] ); // 一般畫筆
+    mB_Normal = new KinButton(); // 一般畫筆
+    mB_Normal.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_normal ), -1 );
+    mB_Normal.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_normal2 ), -1 );
     mB_Normal.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mB_Normal.SetFrame( 0 );
         mPen = CConstant.PENNORMAL;
         mSize = mSizeBar.GetSeekValue();
         Hide();
       }
     } );
-    mB_Eraser = new KinButton( mPenType[1] ); // 橡皮擦
+    mB_Normal.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Normal.SetFrame( 1 );
+      }
+    } );
+
+    mB_Eraser = new KinButton(); // 橡皮擦
+    mB_Eraser.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_eraser ), -1 );
+    mB_Eraser.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_eraser2 ), -1 );
     mB_Eraser.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mB_Eraser.SetFrame( 0 );
         mPen = CConstant.PENERASER;
         mSize = mSizeBar.GetSeekValue();
         Hide();
       }
     } );
-    mB_Highlighter = new KinButton( mPenType[2] ); // 螢光筆
+    mB_Eraser.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Eraser.SetFrame( 1 );
+      }
+    } );
+
+    mB_Highlighter = new KinButton(); // 螢光筆
+    mB_Highlighter.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_highlighter ), -1 );
+    mB_Highlighter.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_highlighter2 ), -1 );
     mB_Highlighter.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mB_Highlighter.SetFrame( 0 );
         mPen = CConstant.PENHIGHLIGHTER;
         mSize = mSizeBar.GetSeekValue();
         Hide();
       }
     } );
-    mB_Watercolor = new KinButton( mPenType[3] ); // 水彩
+    mB_Highlighter.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Highlighter.SetFrame( 1 );
+      }
+    } );
+
+    mB_Watercolor = new KinButton(); // 水彩
+    mB_Watercolor.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_watercolor ), -1 );
+    mB_Watercolor.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_watercolor2 ), -1 );
     mB_Watercolor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mB_Watercolor.SetFrame( 0 );
         mPen = CConstant.PENWATERCOLOR;
         mSize = mSizeBar.GetSeekValue();
         Hide();
       }
     } );
-    mB_Neon = new KinButton( mPenType[4] ); // 霓虹
+    mB_Watercolor.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Watercolor.SetFrame( 1 );
+      }
+    } );
+
+    mB_Neon = new KinButton(); // 霓虹
+    mB_Neon.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_neon ), -1 );
+    mB_Neon.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_neon2 ), -1 );
     mB_Neon.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mB_Neon.SetFrame( 0 );
         mPen = CConstant.PENNEON;
         mSize = mSizeBar.GetSeekValue();
         Hide();
       }
     } );
-    mB_Onlock = new KinButton( mPenType[5] ); // 鎖
+    mB_Neon.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Neon.SetFrame( 1 );
+      }
+    } );
+
+    mB_Onlock = new KinButton(); // 鎖
+    mB_Onlock.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_lock ), -1 );
+    mB_Onlock.AddImage( Main.lib.GetBitmap( R.drawable.selectpen_lock ), -1 );
+    mB_Onlock.SetOnUpRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Onlock.SetFrame( 0 );
+      }
+    } );
+    mB_Onlock.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mB_Onlock.SetFrame( 1 );
+      }
+    } );
+
     mSizeBar = new KinSeekBar();
     mSizeBar.SetMaxValue( CConstant.MaxPenSize );
     mSizeBar.SetMinValue( 1 );

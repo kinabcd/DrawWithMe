@@ -43,13 +43,15 @@ public class CNew extends KinAbsoluteLayout implements IUI {
     mBackground = new KinImage();
     mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
     mBackground.SetSizePercent( 1, 1 );
-    KinImage iOK = new KinImage();
-    iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
-    mBOK = new KinButton( iOK );
+
+    mBOK = new KinButton();
+    mBOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
+    mBOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok2 ), -1 );
     SetAlignment( mBOK, Alignment.RIGHT, Alignment.BOTTOM );
     mBOK.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBOK.SetFrame( 0 );
         if ( mSizeBarX.GetSeekValue() < 1 || mSizeBarY.GetSeekValue() < 1 ) {
           Toast.makeText( Main.sInstance, "Create Fail!!", Toast.LENGTH_SHORT ).show();
           return;
@@ -65,27 +67,52 @@ public class CNew extends KinAbsoluteLayout implements IUI {
         }
       }
     } );
-    KinImage iDefaultSize = new KinImage();
-    iDefaultSize.AddImage( Main.lib.GetBitmap( R.drawable.new_select_bg ), -1 );
-    mBSelectColor = new KinButton( iDefaultSize );
+    mBOK.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBOK.SetFrame( 1 );
+      }
+    } );
+
+    mBSelectColor = new KinButton();
+    mBSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.new_select_bg ), -1 );
+    mBSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.new_select_bg2 ), -1 );
     mBSelectColor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSelectColor.SetFrame( 0 );
         mUISelectColor.Show();
       }
     } );
-    KinImage iReset = new KinImage();
-    iReset.AddImage( Main.lib.GetBitmap( R.drawable.new_reset ), -1 );
-    mBReset = new KinButton( iReset );
+    mBSelectColor.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBSelectColor.SetFrame( 1 );
+      }
+    } );
+
+    mBReset = new KinButton();
+    mBReset.AddImage( Main.lib.GetBitmap( R.drawable.new_reset ), -1 );
+    mBReset.AddImage( Main.lib.GetBitmap( R.drawable.new_reset2 ), -1 );
     SetAlignment( mBReset, Alignment.LEFT, Alignment.BOTTOM );
     mBReset.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBReset.SetFrame( 0 );
         mSizeBarX.SetSeekValue( GetWidth() );
         mSizeBarY.SetSeekValue( GetHeight() );
         mUISelectColor.SetColor( Color.WHITE );
+        mRoomName.SetText( "" );
+        mRoomPassword.SetText( "" );
       }
     } );
+    mBReset.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBReset.SetFrame( 1 );
+      }
+    } );
+
     mSizeBarX = new KinSeekBar();
     mSizeBarX.SetMinValue( 0 );
     mSizeBarX.SetMaxValue( CConstant.MaxWidth );
@@ -108,22 +135,16 @@ public class CNew extends KinAbsoluteLayout implements IUI {
       @Override
       public void run() {
         SetOnline( !mIsOnline );
-        mBCheckOnline.SetFrame( 0 );
-      }
-    } );
-    mBCheckOnline.SetOnDownRun( new Runnable() {
-      @Override
-      public void run() {
-        mBCheckOnline.SetFrame( 1 );
 
       }
     } );
-    mRoomName = new KinEditText();
+
+    mRoomName = new KinEditText(Main.sInstance);
     // mRoomName.SetText( "NAME" );
     mIRoomName = new KinImage();
     mIRoomName.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
 
-    mRoomPassword = new KinEditText();
+    mRoomPassword = new KinEditText(Main.sInstance);
     mIRoomPassword = new KinImage();
     mIRoomPassword.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
     // mRoomPassword.SetText( "PASSWORD" );
@@ -171,10 +192,10 @@ public class CNew extends KinAbsoluteLayout implements IUI {
         (int) ( windowWidth * 0.95 ) );
     mSizeBarY.SetPos( (int) ( windowWidth * 0.05 ), mUISelectSize.GetY(), (int) ( windowWidth * 0.175 ),
         mUISelectSize.GetY() + mUISelectSize.GetHeight() );
-    mRoomName.SetSize( windowWidth * 0.65, windowWidth * 0.125 );
-    mRoomName.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth ) );
-    mRoomPassword.SetSize( windowWidth * 0.65, windowWidth * 0.125 );
-    mRoomPassword.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 1.15 ) );
+    mRoomName.SetSize( windowWidth * 0.65, windowWidth * 0.105 );
+    mRoomName.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 1.01 ) );
+    mRoomPassword.SetSize( windowWidth * 0.65, windowWidth * 0.105 );
+    mRoomPassword.SetPos( (int) ( windowWidth * 0.3 ), (int) ( windowWidth * 1.16 ) );
     mIRoomName.SetSize( windowWidth * 0.7, windowWidth * 0.125 );
     mIRoomName.SetPos( (int) ( windowWidth * 0.28 ), (int) ( windowWidth ) );
     mIRoomPassword.SetSize( windowWidth * 0.7, windowWidth * 0.125 );
@@ -226,5 +247,9 @@ public class CNew extends KinAbsoluteLayout implements IUI {
       mIRoomPassword.SetVisible( false );
     }
     RequireRedraw();
+  }
+
+  public String GetPassword() {
+    return mRoomPassword.GetText();
   }
 }

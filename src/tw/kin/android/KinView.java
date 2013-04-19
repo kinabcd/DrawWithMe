@@ -50,6 +50,10 @@ public class KinView {
   }
 
   public Rect GetViewRect() {
+    if ( mParent == null ) {
+      mViewPos.left = (int) mOffset.x;
+      mViewPos.top = (int) mOffset.y;
+    }
     mViewPos.right = mViewPos.left + GetWidth();
     mViewPos.bottom = mViewPos.top + GetHeight();
     return mViewPos;

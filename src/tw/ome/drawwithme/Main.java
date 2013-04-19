@@ -8,7 +8,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 
 public class Main extends Activity {
   public static Main sInstance = null;

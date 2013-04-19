@@ -31,12 +31,14 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
   KinButton mBSetting;
   KinButton mBChat;
   KinImage mTopbarBG;
+  boolean mIsOnline;
 
   public CDrawBoard() {
   }
 
   public void NewCanvas( int width, int height, int bgColor, boolean internet ) {
     IActionCotroller mode;
+    mIsOnline = internet;
     if ( internet )
       mode = CModeInternet.GetClient();
     else
@@ -62,64 +64,98 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
     mUISelectColor = new CSelectColor();
     mUIChat = new CChat();
     mUICanvas = new CCanvas();
-    KinImage imgSelectPen = new KinImage();
-    imgSelectPen.AddImage( Main.lib.GetBitmap( R.drawable.board_selectpen ), -1 );
-    mBSelectPen = new KinButton( imgSelectPen );
+
+    mBSelectPen = new KinButton();
+    mBSelectPen.AddImage( Main.lib.GetBitmap( R.drawable.board_selectpen ), -1 );
+    mBSelectPen.AddImage( Main.lib.GetBitmap( R.drawable.board_selectpen2 ), -1 );
     mBSelectPen.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSelectPen.SetFrame( 0 );
         if ( mUISelectPen.IsVisible() )
           mUISelectPen.Hide();
         else
           mUISelectPen.Show();
       }
     } );
+    mBSelectPen.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBSelectPen.SetFrame( 1 );
+      }
+    } );
 
-    KinImage imgSelectColor = new KinImage();
-    imgSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.board_selectcolor ), -1 );
-    mBSelectColor = new KinButton( imgSelectColor );
+    mBSelectColor = new KinButton();
+    mBSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.board_selectcolor ), -1 );
+    mBSelectColor.AddImage( Main.lib.GetBitmap( R.drawable.board_selectcolor2 ), -1 );
     mBSelectColor.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSelectColor.SetFrame( 0 );
         if ( mUISelectColor.IsVisible() )
           mUISelectColor.Hide();
         else
           mUISelectColor.Show();
       }
     } );
-
-    KinImage imgCamera = new KinImage();
-    imgCamera.AddImage( Main.lib.GetBitmap( R.drawable.board_camera ), -1 );
-    mBCamera = new KinButton( imgCamera );
-    mBCamera.SetOnUpRun( new Runnable() {
-
+    mBSelectColor.SetOnDownRun( new Runnable() {
       @Override
       public void run() {
+        mBSelectColor.SetFrame( 1 );
+      }
+    } );
+
+    mBCamera = new KinButton();
+    mBCamera.AddImage( Main.lib.GetBitmap( R.drawable.board_camera ), -1 );
+    mBCamera.AddImage( Main.lib.GetBitmap( R.drawable.board_camera2 ), -1 );
+    mBCamera.SetOnUpRun( new Runnable() {
+      @Override
+      public void run() {
+        mBCamera.SetFrame( 0 );
         mUICanvas.Save();
       }
 
     } );
-
-    KinImage imgSetting = new KinImage();
-    imgSetting.AddImage( Main.lib.GetBitmap( R.drawable.board_setting ), -1 );
-    mBSetting = new KinButton( imgSetting );
-    mBSetting.SetOnUpRun( new Runnable() {
-
+    mBCamera.SetOnDownRun( new Runnable() {
       @Override
       public void run() {
+        mBCamera.SetFrame( 1 );
       }
     } );
 
-    KinImage imgDialogBox = new KinImage();
-    imgDialogBox.AddImage( Main.lib.GetBitmap( R.drawable.board_dialogbox ), -1 );
-    mBChat = new KinButton( imgDialogBox );
-    mBChat.SetOnUpRun( new Runnable() {
-
+    mBSetting = new KinButton();
+    mBSetting.AddImage( Main.lib.GetBitmap( R.drawable.board_setting ), -1 );
+    mBSetting.AddImage( Main.lib.GetBitmap( R.drawable.board_setting2 ), -1 );
+    mBSetting.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSetting.SetFrame( 0 );
+      }
+    } );
+    mBSetting.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBSetting.SetFrame( 1 );
+      }
+    } );
+
+    mBChat = new KinButton();
+    mBChat.AddImage( Main.lib.GetBitmap( R.drawable.board_dialogbox ), -1 );
+    mBChat.AddImage( Main.lib.GetBitmap( R.drawable.board_dialogbox2 ), -1 );
+    mBChat.SetOnUpRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChat.SetFrame( 0 );
         ToggleChat();
       }
     } );
+    mBChat.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChat.SetFrame( 1 );
+      }
+    } );
+
     mTopbarBG = new KinImage();
     mTopbarBG.AddImage( Main.lib.GetBitmap( R.drawable.board_topbar_bg ), -1 );
     SetAlignment( mTopbarBG, Alignment.LEFT, Alignment.TOP );
@@ -193,6 +229,8 @@ public class CDrawBoard extends KinAbsoluteLayout implements IUI {
       ad.setPositiveButton( "Yes", new DialogInterface.OnClickListener() {
         public void onClick( DialogInterface dialog, int whichButton ) {
           DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
+          if ( mIsOnline )
+            CModeInternet.LeaveRoom();
         }
       } );
       ad.setCancelable( true );

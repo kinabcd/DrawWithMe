@@ -46,7 +46,9 @@ public abstract class KinLayout extends KinView {
     if ( mChild.isEmpty() ) return false;
     for ( int i = mChild.size() - 1; i >= 0; i -= 1 ) {
       KinView child = mChild.get( i );
-      if ( child.onTouchEvent( event ) ) return true;
+      if ( child.onTouchEvent( event ) ) {
+        return true;
+      }
     }
     return false;
   }
@@ -65,5 +67,6 @@ public abstract class KinLayout extends KinView {
   public void PosUpdate() {
 
   }
+
   public abstract int GetChildHeight();
 }

@@ -10,7 +10,6 @@ import tw.ome.drawwithme.ui.CMenu;
 import tw.ome.drawwithme.ui.CNew;
 import tw.ome.drawwithme.ui.IUI;
 import android.content.Context;
-import android.graphics.Typeface;
 import android.os.Looper;
 import android.view.SurfaceHolder;
 
@@ -77,7 +76,6 @@ public class DrawSurface extends KinDrawTable {
   Thread LoadContent = new Thread() {
     public void run() {
       Looper.prepare();
-      CConstant.TFShowFong = Typeface.createFromAsset( Main.sInstance.getAssets(), "showfong.ttc" );
       KinImage mBackground = new KinImage();
       mBackground.AddImage( Main.lib.GetBitmap( R.drawable.menu_bg ), -1 );
       mBackground.SetPos( 0, 0, mWindowWidth, mWindowHeight );

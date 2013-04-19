@@ -1,8 +1,6 @@
 package tw.kin.android.widget;
 
 import tw.kin.android.KinPoint;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.view.MotionEvent;
 
 public class KinButton extends KinImage {

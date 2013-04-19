@@ -2,7 +2,6 @@ package tw.kin.android;
 
 import java.io.InputStream;
 
-import tw.kin.android.connection.KinInputConnection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +10,6 @@ import android.util.SparseArray;
 public class KinLib {
 
   Context sContext;
-  KinInputConnection mInputConnection;
   public static SparseArray<Bitmap> sCache = new SparseArray<Bitmap>(); // 相同的圖片只需讀取一次
 
   public void SetContext( Context context ) {

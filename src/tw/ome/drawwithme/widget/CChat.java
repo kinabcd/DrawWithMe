@@ -4,16 +4,16 @@ import tw.kin.android.layout.KinAbsoluteLayout;
 import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinEditText;
 import tw.kin.android.widget.KinImage;
-import tw.kin.android.widget.KinLable;
+import tw.kin.android.widget.KinLabel;
 import tw.kin.android.widget.KinScroll;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 
 public class CChat extends KinAbsoluteLayout {
 
-  KinLable mRoomNumber;
+  KinLabel mRoomNumber;
   KinImage mRoomOnlock;
-  KinLable mRoomName;
+  KinLabel mRoomName;
 
   KinButton mBPageRoommate;
   KinImage mPageRoommateUp;
@@ -34,11 +34,11 @@ public class CChat extends KinAbsoluteLayout {
 
   public CChat() {
     this.SetBackground( 0x80ffffff );
-    mRoomNumber = new KinLable();
+    mRoomNumber = new KinLabel();
     mRoomNumber.SetText( "No.999" );
     mRoomOnlock = new KinImage();
     mRoomOnlock.AddImage( Main.lib.GetBitmap( R.drawable.chat_lock ), -1 );
-    mRoomName = new KinLable();
+    mRoomName = new KinLabel();
     mRoomName.SetText( "RoomName" );
 
     mPageRoommateUp = new KinImage();
@@ -92,7 +92,7 @@ public class CChat extends KinAbsoluteLayout {
 
     mInputBg = new KinImage();
     mInputBg.AddImage( Main.lib.GetBitmap( R.drawable.chat_inputbg ), -1 );
-    mInputMessage = new KinEditText();
+    mInputMessage = new KinEditText(Main.sInstance);
 
     KinImage iSend = new KinImage();
     iSend.AddImage( Main.lib.GetBitmap( R.drawable.chat_send_disable ), -1 );

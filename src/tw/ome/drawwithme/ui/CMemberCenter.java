@@ -2,23 +2,24 @@ package tw.ome.drawwithme.ui;
 
 import tw.kin.android.layout.KinAbsoluteLayout;
 import tw.kin.android.widget.KinButton;
-import tw.kin.android.widget.KinEditText;
 import tw.kin.android.widget.KinImage;
-import tw.kin.android.widget.KinLable;
+import tw.kin.android.widget.KinLabel;
 import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
 import tw.ome.drawwithme.protocal.CModeInternet;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.KeyEvent;
 
 public class CMemberCenter extends KinAbsoluteLayout implements IUI {
 
   KinImage mBackground;
   KinImage mTitle;
-  KinEditText mAccount;
-  KinLable mNickname;
-  KinLable mPassword;
+  KinLabel mAccount;
+  KinLabel mNickname;
+  KinLabel mPassword;
 
   KinButton mBLogout;
   KinButton mBChangeNickname;
@@ -30,7 +31,11 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
 
   @Override
   public void onStart( IUI from ) {
-
+    SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
+    if ( DrawSurface.GetInstance().mUIMenu.mRememberAccount!=null && !DrawSurface.GetInstance().mUIMenu.mRememberAccount.equals( "" ) )
+      mAccount.SetText( DrawSurface.GetInstance().mUIMenu.mRememberAccount );
+    else if ( !mSp.getString( "UserAccount", "" ).equals( "" ) )
+      mAccount.SetText( mSp.getString( "UserAccount", "" ) );
   }
 
   @Override
@@ -48,39 +53,87 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     mTitle.SetSizePercent( 0.95, 0.25 ); // 設定標題大小(百分比)
     SetAlignment( mTitle, Alignment.CENTER, Alignment.TOP );
 
-    mAccount = new KinEditText();
+    mAccount = new KinLabel();
     mAccount.SetSizePercent( 0.75, 0.1 );
-    mNickname = new KinLable();
+    mNickname = new KinLabel();
     mNickname.SetSizePercent( 0.75, 0.1 );
-    mPassword = new KinLable();
+    mPassword = new KinLabel();
     mPassword.SetSizePercent( 0.75, 0.1 );
 
-    KinImage iLogout = new KinImage();
-    iLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout ), -1 );
-    mBLogout = new KinButton( iLogout );
+    mBLogout = new KinButton();
+    mBLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout ), -1 );
+    mBLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout2 ), -1 );
     mBLogout.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBLogout.SetFrame( 0 );
         CModeInternet.Logout();
+        SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
+        Editor editor = mSp.edit(); // 清空設定檔
+        editor.putString( "UserAccount", "" );
+        editor.putString( "UserPassword", "" );
+        editor.commit();
+        DrawSurface.GetInstance().mUIMenu.mScroll.GetLayout().CleanChild();
+        DrawSurface.GetInstance().mUIMenu.mScroll.GetLayout().AddChild( DrawSurface.GetInstance().mUIMenu.mButtonBar );
         DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
       }
     } );
-    KinImage iChangeNickname = new KinImage();
-    iChangeNickname.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
-    mBChangeNickname = new KinButton( iChangeNickname );
-    // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
-    KinImage iChangePassword = new KinImage();
-    iChangePassword.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
-    mBChangePassword = new KinButton( iChangePassword );
-    // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
-    KinImage iOK = new KinImage();
-    iOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
-    mBOK = new KinButton( iOK );
+    mBLogout.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBLogout.SetFrame( 1 );
+      }
+    } );
+
+    mBChangeNickname = new KinButton();
+    mBChangeNickname.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
+    mBChangeNickname.AddImage( Main.lib.GetBitmap( R.drawable.edit2 ), -1 );
+    mBChangeNickname.SetOnUpRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChangeNickname.SetFrame( 0 );
+        // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
+      }
+    } );
+    mBChangeNickname.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChangeNickname.SetFrame( 1 );
+      }
+    } );
+
+    mBChangePassword = new KinButton();
+    mBChangePassword.AddImage( Main.lib.GetBitmap( R.drawable.edit ), -1 );
+    mBChangePassword.AddImage( Main.lib.GetBitmap( R.drawable.edit2 ), -1 );
+    mBChangePassword.SetOnUpRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChangePassword.SetFrame( 0 );
+        // etConfirm.setFilters(new InputFilter[]{CConstant.ACCOUNTFILTER, new InputFilter.LengthFilter(16)});
+      }
+    } );
+    mBChangePassword.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBChangePassword.SetFrame( 1 );
+      }
+    } );
+
+    mBOK = new KinButton();
+    mBOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok ), -1 );
+    mBOK.AddImage( Main.lib.GetBitmap( R.drawable.new_ok2 ), -1 );
     SetAlignment( mBOK, Alignment.CENTER, Alignment.BOTTOM );
     mBOK.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBOK.SetFrame( 0 );
         DrawSurface.GetInstance().SetPage( CConstant.PAGEMENU );
+      }
+    } );
+    mBOK.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBOK.SetFrame( 1 );
       }
     } );
 

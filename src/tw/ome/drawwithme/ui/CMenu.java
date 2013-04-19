@@ -3,7 +3,7 @@ package tw.ome.drawwithme.ui;
 import tw.kin.android.layout.KinAbsoluteLayout;
 import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
-import tw.kin.android.widget.KinLable;
+import tw.kin.android.widget.KinLabel;
 import tw.kin.android.widget.KinScroll;
 import tw.ome.drawwithme.CConstant;
 import tw.ome.drawwithme.DrawSurface;
@@ -13,6 +13,9 @@ import tw.ome.drawwithme.protocal.CModeInternet;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.DialogInterface.OnDismissListener;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -29,9 +32,9 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     boolean mLock;
     int mId;
     KinImage mLockImg = new KinImage();
-    KinLable mLableNum = new KinLable();
-    KinLable mLableId = new KinLable();
-    KinLable mLableName = new KinLable();
+    KinLabel mLableNum = new KinLabel();
+    KinLabel mLableId = new KinLabel();
+    KinLabel mLableName = new KinLabel();
     KinButton mButton = new KinButton();
 
     public Room(int id, String name, boolean lock, int peopleNum) {
@@ -44,7 +47,6 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       mLockImg.SetFit( KinImage.SCALE );
       mLableId.SetText( "No." + id );
       mLableId.SetSizePercent( 0.9, 0.4444 );
-      mLableId.SetTypeface( CConstant.TFShowFong );
       mLableId.SetTextColor( 0xff000088 );
       mLableId.SetBold( true );
       mLableName.SetText( name );
@@ -59,12 +61,12 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
         @Override
         public void run() {
           AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
-          builder.setTitle( "Search" );
+          builder.setTitle( "Join Room" );
           final LinearLayout view = new LinearLayout( Main.sInstance );
           view.setOrientation( LinearLayout.VERTICAL );
           final EditText inputpass = new EditText( Main.sInstance );
           if ( mLock ) {
-            inputpass.setHint( "Passwork..." );
+            inputpass.setHint( "Password..." );
             inputpass.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
             inputpass.setTypeface( Typeface.SERIF );
             view.addView( inputpass );
@@ -79,7 +81,17 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
               CModeInternet.JoinRoom( mId, roomPassword );
             }
           } );
-          builder.show();
+          AlertDialog ad = builder.create();
+          ad.setOnDismissListener( new OnDismissListener() { // when closing dialog
+            @Override
+            public void onDismiss( DialogInterface dialog ) {
+              if ( mLock )
+                CloseKeyboard();
+            }
+          } );
+          ad.show();
+          if ( mLock )
+            OpenKeyboard();
         }
       } );
       SetAlignment( mLableId, Alignment.RIGHT, Alignment.TOP );
@@ -106,6 +118,9 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
   KinAbsoluteLayout mButtonBar;
   int mLastSearch;
   String mLastSearchStr;
+  Boolean mRememberMe = false;
+  String mRememberAccount;
+  String mRememberPassword;
 
   public CMenu() {
     super();
@@ -131,24 +146,37 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     mTitle.SetSizePercent( 0.95, 0.25 ); // 設定標題大小(百分比)
     SetAlignment( mTitle, Alignment.CENTER, Alignment.TOP );
 
-    KinImage iRefresh = new KinImage();
-    iRefresh.AddImage( Main.lib.GetBitmap( R.drawable.menu_refresh ), -1 );
-    mBRefresh = new KinButton( iRefresh );
+    mBRefresh = new KinButton();
+    mBRefresh.AddImage( Main.lib.GetBitmap( R.drawable.menu_refresh ), -1 );
+    mBRefresh.AddImage( Main.lib.GetBitmap( R.drawable.menu_refresh2 ), -1 );
     mBRefresh.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
-        // TODO refresh menu
+        mBRefresh.SetFrame( 0 );
+        if ( !CModeInternet.IsLogin() )
+          return;
         mScroll.GetLayout().CleanChild();
         mScroll.GetLayout().AddChild( mButtonBar );
         CModeInternet.Search( mLastSearch, mLastSearchStr );
       }
     } );
-    KinImage iSearch = new KinImage();
-    iSearch.AddImage( Main.lib.GetBitmap( R.drawable.menu_search ), -1 );
-    mBSearch = new KinButton( iSearch );
+    mBRefresh.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBRefresh.SetFrame( 1 );
+
+      }
+    } );
+
+    mBSearch = new KinButton();
+    mBSearch.AddImage( Main.lib.GetBitmap( R.drawable.menu_search ), -1 );
+    mBSearch.AddImage( Main.lib.GetBitmap( R.drawable.menu_search2 ), -1 );
     mBSearch.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSearch.SetFrame( 0 );
+        if ( !CModeInternet.IsLogin() )
+          return;
         AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
         builder.setTitle( "Search" );
         final LinearLayout view = new LinearLayout( Main.sInstance );
@@ -186,40 +214,71 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
             }
 
             mLastSearchStr = inputKeyword.getText().toString();
-            InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
-            imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
           }
         } );
-        builder.show();
-        InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
-        imm.toggleSoftInput( InputMethodManager.SHOW_FORCED, 0 ); // show keyboard
+        AlertDialog ad = builder.create();
+        ad.setOnDismissListener( new OnDismissListener() { // when closing dialog
+          @Override
+          public void onDismiss( DialogInterface dialog ) {
+            CloseKeyboard();
+          }
+        } );
+        ad.show();
+        OpenKeyboard();
       }
     } );
-    KinImage iSetting = new KinImage();
-    iSetting.AddImage( Main.lib.GetBitmap( R.drawable.menu_setting ), -1 );
-    mBSetting = new KinButton( iSetting );
+    mBSearch.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBSearch.SetFrame( 1 );
+
+      }
+    } );
+
+    mBSetting = new KinButton();
+    mBSetting.AddImage( Main.lib.GetBitmap( R.drawable.menu_setting ), -1 );
+    mBSetting.AddImage( Main.lib.GetBitmap( R.drawable.menu_setting2 ), -1 );
     mBSetting.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBSetting.SetFrame( 0 );
         if ( CModeInternet.IsLogin() )
           DrawSurface.GetInstance().SetPage( CConstant.PAGEMEMBER );
       }
     } );
-    KinImage iCreate = new KinImage();
-    iCreate.AddImage( Main.lib.GetBitmap( R.drawable.menu_create ), -1 );
-    mBCreate = new KinButton( iCreate );
+    mBSetting.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBSetting.SetFrame( 1 );
+
+      }
+    } );
+
+    mBCreate = new KinButton();
+    mBCreate.AddImage( Main.lib.GetBitmap( R.drawable.menu_create ), -1 );
+    mBCreate.AddImage( Main.lib.GetBitmap( R.drawable.menu_create2 ), -1 );
     mBCreate.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBCreate.SetFrame( 0 );
         DrawSurface.GetInstance().SetPage( CConstant.PAGENEW );
       }
     } );
-    KinImage iLogin = new KinImage();
-    iLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login ), -1 );
-    mBLogin = new KinButton( iLogin );
+    mBCreate.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBCreate.SetFrame( 1 );
+
+      }
+    } );
+
+    mBLogin = new KinButton();
+    mBLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login ), -1 );
+    mBLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login2 ), -1 );
     mBLogin.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        mBLogin.SetFrame( 0 );
         AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
         builder.setTitle( "Login" );
         final LinearLayout view = new LinearLayout( Main.sInstance );
@@ -245,14 +304,10 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
         builder.setPositiveButton( "Login", new DialogInterface.OnClickListener() {
           @Override
           public void onClick( DialogInterface dialog, int which ) {
-            CModeInternet.Login( inputAccount.getText().toString(), inputPasswd.getText().toString() );
-            mScroll.GetLayout().CleanChild();
-            mScroll.GetLayout().AddChild( mButtonBar );
-            CModeInternet.Search( 0x03, "" );
-            mLastSearch = 0x03;
-            mLastSearchStr = new String( "" );
-            InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
-            imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
+            mRememberMe = checkRemember.isChecked();
+            mRememberAccount = inputAccount.getText().toString();
+            mRememberPassword = inputPasswd.getText().toString();
+            CModeInternet.Login( mRememberAccount, mRememberPassword );
           }
         } );
         builder.setNeutralButton( "Register", new DialogInterface.OnClickListener() {
@@ -287,19 +342,37 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
                 else
                   ;// TODO show confirm error
 
-                InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
-                imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
               }
             } );
-            builder.show();
+            AlertDialog ad = builder.create();
+            ad.setOnDismissListener( new OnDismissListener() { // when closing dialog
+              @Override
+              public void onDismiss( DialogInterface dialog ) {
+                CloseKeyboard();
+              }
+            } );
+            ad.show();
           }
         } );
-        builder.show();
-
-        InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
-        imm.toggleSoftInput( InputMethodManager.SHOW_FORCED, 0 ); // show keyboard
+        AlertDialog ad = builder.create();
+        ad.setOnDismissListener( new OnDismissListener() { // when closing dialog
+          @Override
+          public void onDismiss( DialogInterface dialog ) {
+            CloseKeyboard();
+          }
+        } );
+        ad.show();
+        OpenKeyboard();
       }
     } );
+    mBLogin.SetOnDownRun( new Runnable() {
+      @Override
+      public void run() {
+        mBLogin.SetFrame( 1 );
+
+      }
+    } );
+
     mButtonBar = new KinAbsoluteLayout();
     mButtonBar.AddChild( mBCreate );
     mButtonBar.AddChild( mBLogin );
@@ -333,6 +406,11 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
 
   @Override
   public void onStart( IUI from ) {
+    if ( from == null ) {
+      SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
+      if ( !mSp.getString( "UserAccount", "" ).equals( "" ) && !mSp.getString( "UserPassword", "" ).equals( "" ) ) // 設定檔有存帳密就自動登入
+        CModeInternet.Login( mSp.getString( "UserAccount", "" ), mSp.getString( "UserPassword", "" ) );
+    }
     mScroll.SetScroll( 0 );
     RequireRedraw();
   }
@@ -349,6 +427,33 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       return true;
     }
     return super.onKeyDown( keycode, event );
+  }
+
+  public void AfterLogin() {
+    mScroll.GetLayout().CleanChild();
+    mScroll.GetLayout().AddChild( mButtonBar );
+    CModeInternet.Search( 0x03, "" );
+    mLastSearch = 0x03;
+    mLastSearchStr = new String( "" );
+
+    SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
+    Editor editor = mSp.edit();
+    if ( mRememberMe ) { // 寫入設定檔
+      editor.putString( "UserAccount", mRememberAccount );
+      editor.putString( "UserPassword", mRememberPassword );
+      editor.commit();
+    }
+    mRememberMe = false;
+  }
+
+  void OpenKeyboard() {
+    InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+    imm.toggleSoftInput( InputMethodManager.SHOW_FORCED, 0 ); // show keyboard
+  }
+
+  void CloseKeyboard() {
+    InputMethodManager imm = (InputMethodManager) Main.sInstance.getSystemService( Context.INPUT_METHOD_SERVICE );
+    imm.toggleSoftInput( InputMethodManager.SHOW_IMPLICIT, 0 ); // close keyboard
   }
 
 }

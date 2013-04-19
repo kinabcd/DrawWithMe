@@ -1,6 +1,5 @@
 package tw.ome.drawwithme;
 
-import android.graphics.Typeface;
 import android.text.InputFilter;
 import android.text.Spanned;
 
@@ -19,7 +18,6 @@ public class CConstant {
   public final static int PENHIGHLIGHTER = 2;
   public final static int PENWATERCOLOR = 3;
   public final static int PENNEON = 4;
-  public static Typeface TFShowFong;
 
   public final static InputFilter NICKNAMEFILTER = new InputFilter() {
     // only Chinese,English,Number

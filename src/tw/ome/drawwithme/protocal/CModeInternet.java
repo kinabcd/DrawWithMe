@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 public class CModeInternet implements IActionCotroller {
   public static final int SERVERPORT = 55661;
@@ -167,7 +168,6 @@ public class CModeInternet implements IActionCotroller {
     ByteCopy( text, bytePw, 17, 16 );
 
     GetClient().SendPacket( text );
-    GetClient().mIsLogin = true;
   }
 
   public static void Logout() {
@@ -498,8 +498,13 @@ public class CModeInternet implements IActionCotroller {
           Log.i( "0x22_0", "accountNumber: " + Integer.toString( accountNumber ) );
           Log.i( "0x22_0", "Nickname: " + nickname );
           Log.i( "0x22_0", "accessToken: " + accessToken );
-        } else if ( result == 1 )
+          GetClient().mIsLogin = true;
+          DrawSurface.GetInstance().mUIMenu.AfterLogin();
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "Login Success!!", Toast.LENGTH_LONG ).show();
+        } else if ( result == 1 ) {
           Log.i( "0x22_1", "Login Failed!" );
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "Login Failed!!", Toast.LENGTH_LONG ).show();
+        }
         return true;
       } else if ( head == 0x23 ) { // 密碼更改結果
         if ( bufferLen < 5 ) {
@@ -538,7 +543,7 @@ public class CModeInternet implements IActionCotroller {
         int id = ReadInt();
         if ( result == 0 ) {
           Log.i( "0x25_0", "Create Success!" );
-          JoinRoom( id, "" );
+          JoinRoom( id, DrawSurface.GetInstance().mUINew.GetPassword() );
         } else if ( result == 1 )
           Log.i( "0x25_1", "Room Name Error!" );
         else if ( result == 2 )
@@ -560,14 +565,22 @@ public class CModeInternet implements IActionCotroller {
           Log.i( "0x26_0", "Join Success!" );
           DrawSurface.GetInstance().mUICanvas.NewCanvas( width, height, color, true );
           DrawSurface.GetInstance().SetPage( CConstant.PAGECANVAS );
-        } else if ( result == 1 )
+        } else if ( result == 1 ) {
           Log.i( "0x26_1", "Password Error!" );
-        else if ( result == 2 )
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "Password Error!", Toast.LENGTH_LONG ).show();
+        }
+        else if ( result == 2 ) {
           Log.i( "0x26_2", "Room is Full!" );
-        else if ( result == 3 )
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "Room is Full!", Toast.LENGTH_LONG ).show();
+        }
+        else if ( result == 3 ) {
           Log.i( "0x26_3", "You were Banned!" );
-        else if ( result == 4 )
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "You were Banned!", Toast.LENGTH_LONG ).show();
+        }
+        else if ( result == 4 ) {
           Log.i( "0x26_4", "Without Room!" );
+          Toast.makeText( DrawSurface.GetInstance().getContext(), "Room does not exit!", Toast.LENGTH_LONG ).show();
+        }
         else if ( result == 9 )
           Log.i( "0x26_9", "Not Login!" );
 

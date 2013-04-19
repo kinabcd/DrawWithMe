@@ -1,6 +1,5 @@
 package tw.kin.android;
 
-import tw.kin.android.connection.KinInputConnection;
 import tw.kin.android.layout.KinAbsoluteLayout;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,8 +8,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
 
 public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback {
   int mPageStatus;
@@ -19,6 +16,7 @@ public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback 
   SurfaceHolder msfh;
   KinLayout mView;
   KinRepeat mDrawThread;
+  Context mContext;
 
   public KinDrawTable(Context context) {
     super( context );
@@ -27,6 +25,7 @@ public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback 
     this.setFocusable( true );
     this.setFocusableInTouchMode( true );
     mView = new KinAbsoluteLayout();
+    mContext = context;
 
   }
 
@@ -42,19 +41,16 @@ public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback 
     mView.CleanChild();
   }
 
-  @Override
   public void surfaceCreated( SurfaceHolder holder ) {
     mDrawThread = new KinRepeat( mDrawMethod, "Draw" );
     mDrawThread.start();
   }
 
-  @Override
   public void surfaceChanged( SurfaceHolder holder, int format, int width, int height ) {
     mView.SetSize( width, height );
 
   }
 
-  @Override
   public void surfaceDestroyed( SurfaceHolder holder ) {
     mDrawThread.Finish();
     mDrawThread = null;
@@ -72,11 +68,6 @@ public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback 
     return super.onTouchEvent( event );
   }
 
-  @Override
-  public InputConnection onCreateInputConnection( EditorInfo outAttrs ) {
-    return new KinInputConnection( this, false );// super.onCreateInputConnection(outAttrs);
-  }
-
   public Canvas LockCanvas( Rect rect ) {
     return msfh.lockCanvas( rect );
   }
@@ -90,7 +81,6 @@ public class KinDrawTable extends SurfaceView implements SurfaceHolder.Callback 
   }
 
   Runnable mDrawMethod = new Runnable() {
-    @Override
     public void run() {
       if ( mView.HasUpdate() ) {
         Canvas canvas = LockCanvas( null );

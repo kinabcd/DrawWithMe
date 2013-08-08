@@ -202,13 +202,13 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
           public void onClick( DialogInterface dialog, int which ) {
             mScroll.GetLayout().CleanChild();
             mScroll.GetLayout().AddChild( mButtonBar );
-            if ( checkNo.isChecked() && !checkName.isChecked() ) {
+            if ( checkNo.isChecked() && !checkName.isChecked() ) { // name
               CModeInternet.Search( 0x01, inputKeyword.getText().toString() );
               mLastSearch = 0x01;
-            } else if ( !checkNo.isChecked() && checkName.isChecked() ) {
+            } else if ( !checkNo.isChecked() && checkName.isChecked() ) { // No
               CModeInternet.Search( 0x02, inputKeyword.getText().toString() );
               mLastSearch = 0x02;
-            } else if ( checkNo.isChecked() && checkName.isChecked() ) {
+            } else if ( checkNo.isChecked() && checkName.isChecked() ) { // both
               CModeInternet.Search( 0x03, inputKeyword.getText().toString() );
               mLastSearch = 0x03;
             }
@@ -275,9 +275,12 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     mBLogin = new KinButton();
     mBLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login ), -1 );
     mBLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_login2 ), -1 );
+    mBLogin.AddImage( Main.lib.GetBitmap( R.drawable.menu_welcome ), -1 );
     mBLogin.SetOnUpRun( new Runnable() {
       @Override
       public void run() {
+        if ( CModeInternet.IsLogin() ) // 已登入
+          return ;
         mBLogin.SetFrame( 0 );
         AlertDialog.Builder builder = new AlertDialog.Builder( Main.sInstance );
         builder.setTitle( "Login" );
@@ -368,11 +371,12 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
     mBLogin.SetOnDownRun( new Runnable() {
       @Override
       public void run() {
+        if ( CModeInternet.IsLogin() ) // 已登入
+          return ;
         mBLogin.SetFrame( 1 );
 
       }
     } );
-
     mButtonBar = new KinAbsoluteLayout();
     mButtonBar.AddChild( mBCreate );
     mButtonBar.AddChild( mBLogin );
@@ -408,9 +412,14 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
   public void onStart( IUI from ) {
     if ( from == null ) {
       SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
-      if ( !mSp.getString( "UserAccount", "" ).equals( "" ) && !mSp.getString( "UserPassword", "" ).equals( "" ) ) // 設定檔有存帳密就自動登入
-        CModeInternet.Login( mSp.getString( "UserAccount", "" ), mSp.getString( "UserPassword", "" ) );
+      if ( !mSp.getString( "UserAccount", "" ).equals( "" ) && !mSp.getString( "UserPassword", "" ).equals( "" ) ) {
+        CModeInternet.Login( mSp.getString( "UserAccount", "" ), mSp.getString( "UserPassword", "" ) );// 設定檔有存帳密就自動登入
+      }
     }
+    if ( CModeInternet.IsLogin() )
+      mBLogin.SetFrame( 2 );
+    else
+      mBLogin.SetFrame( 0 );
     mScroll.SetScroll( 0 );
     RequireRedraw();
   }
@@ -444,6 +453,7 @@ public class CMenu extends KinAbsoluteLayout implements IUI {
       editor.commit();
     }
     mRememberMe = false;
+    mBLogin.SetFrame( 2 );
   }
 
   void OpenKeyboard() {

@@ -1,14 +1,19 @@
 package tw.ome.drawwithme.widget;
 
 import tw.kin.android.KinView;
+import tw.kin.android.widget.KinButton;
 import tw.kin.android.widget.KinImage;
+import tw.ome.drawwithme.DrawSurface;
 import tw.ome.drawwithme.Main;
 import tw.ome.drawwithme.R;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 public class CSelectColor extends KinView {
   KinImage mShadow;
@@ -19,6 +24,8 @@ public class CSelectColor extends KinView {
   int mCenterY;
   int mOutR;
   int mInR;
+  KinButton mBAdvColor;
+  long mTouchDownTime ;
 
   public void Hide() {
     mVisible = false;
@@ -27,6 +34,13 @@ public class CSelectColor extends KinView {
 
   public void Show() {
     mVisible = true;
+    SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
+    if ( mSp.getString( "FirstUse", "false" ).equals( "false" ) ) { // 第一次開選色
+      Editor editor = mSp.edit();
+      editor.putString( "FirstUse", "True" );
+      editor.commit();
+      Toast.makeText( DrawSurface.GetInstance().getContext(), "Long press to edit the fan color", Toast.LENGTH_LONG ).show();
+    }
     RequireRedraw();
   }
 
@@ -46,6 +60,7 @@ public class CSelectColor extends KinView {
       mSelectors[i].Draw( canvas );
       canvas.rotate( 45, mCenterX, mCenterY );
     }
+    mBAdvColor.Draw( canvas );
   }
 
   public CSelectColor() {
@@ -65,6 +80,10 @@ public class CSelectColor extends KinView {
     SetSelectorColor( 5, 0xff0000ff );
     SetSelectorColor( 6, 0xff000000 );
     SetSelectorColor( 7, 0xffff00ff );
+
+    mBAdvColor = new KinButton();
+    mBAdvColor.AddImage( Main.lib.GetBitmap( R.drawable.board_more_colors ), -1 );
+
   }
 
   public int GetColor() {
@@ -108,6 +127,9 @@ public class CSelectColor extends KinView {
       mSelectors[i].SetPos( rX, rY, rX + rWidth, rY + rHeight );
     }
     mShadow.SetPos( rX, rY, rX + rWidth, rY + rHeight );
+
+    int sideLength = (int) ( mInR / 1.414 );
+    mBAdvColor.SetPos( mCenterX - sideLength, mCenterY - sideLength, mCenterX + sideLength, mCenterY + sideLength );
     RequireRedraw();
   }
 
@@ -120,13 +142,40 @@ public class CSelectColor extends KinView {
     double d = Math.sqrt( ( x - mCenterX ) * ( x - mCenterX ) + ( y - mCenterY ) * ( y - mCenterY ) );
     double radian = Math.atan2( mCenterY - y, mCenterX - x ) + Math.PI;
     int area = ( (int) ( ( Math.toDegrees( radian ) + 22.5 ) / 45 ) + 2 ) % 8;
-    if ( d < mOutR && d > mInR )
-      mColor = mBaseColor[area];
-
-    if ( event.getAction() == MotionEvent.ACTION_UP ) {
+    if ( d < mOutR && d > mInR ) { // 按到扇形
+      if ( event.getAction() == MotionEvent.ACTION_DOWN ) // DOWN時先記錄時間
+        mTouchDownTime = event.getEventTime();
+      else if (event.getAction() == MotionEvent.ACTION_UP ) { // UP時判斷長or短按
+        long pressTime = event.getEventTime() - mTouchDownTime ;
+        if ( pressTime >= 500 ) { // long press
+          final int myarea = area;
+          ColorPickerDialog dialog = new ColorPickerDialog( Main.sInstance, mColor, "Advance Color", new ColorPickerDialog.OnColorChangedListener() {
+            @Override
+            public void colorChanged( int color ) {
+              mColor = color;
+              SetSelectorColor( myarea, color );
+            }
+          } );
+          dialog.setSize( mCenterX * 2, mCenterY * 2 );
+          Hide();
+          dialog.show();
+        } else { // short press
+          mColor = mBaseColor[area];
+          Hide();
+        }
+      }
+    } else if ( d < mInR ) {
+      ColorPickerDialog dialog = new ColorPickerDialog( Main.sInstance, mColor, "Advance Color", new ColorPickerDialog.OnColorChangedListener() {
+        @Override
+        public void colorChanged( int color ) {
+          mColor = color;
+        }
+      } );
+      dialog.setSize( mCenterX * 2, mCenterY * 2 );
       Hide();
-      return true;
-    }
+      dialog.show();
+    } else
+      Hide();
 
     return true;
   }
@@ -141,4 +190,5 @@ public class CSelectColor extends KinView {
     }
     return false;
   }
+
 }

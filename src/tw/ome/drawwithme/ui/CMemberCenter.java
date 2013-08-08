@@ -18,8 +18,12 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
   KinImage mBackground;
   KinImage mTitle;
   KinLabel mAccount;
+  KinImage mAccountBG;
   KinLabel mNickname;
+  KinImage mNicknameBG;
   KinLabel mPassword;
+  KinImage mPasswordBG;
+
 
   KinButton mBLogout;
   KinButton mBChangeNickname;
@@ -31,11 +35,9 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
 
   @Override
   public void onStart( IUI from ) {
-    SharedPreferences mSp = Main.sInstance.getSharedPreferences( "Options", android.content.Context.MODE_PRIVATE );
-    if ( DrawSurface.GetInstance().mUIMenu.mRememberAccount!=null && !DrawSurface.GetInstance().mUIMenu.mRememberAccount.equals( "" ) )
-      mAccount.SetText( DrawSurface.GetInstance().mUIMenu.mRememberAccount );
-    else if ( !mSp.getString( "UserAccount", "" ).equals( "" ) )
-      mAccount.SetText( mSp.getString( "UserAccount", "" ) );
+    mAccount.SetText( "(" + CModeInternet.GetClient().mUserId + ")" + CModeInternet.GetClient().mAccount );
+    mNickname.SetText( CModeInternet.GetClient().mUserName );
+    mPassword.SetText( "********" );
   }
 
   @Override
@@ -59,7 +61,16 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     mNickname.SetSizePercent( 0.75, 0.1 );
     mPassword = new KinLabel();
     mPassword.SetSizePercent( 0.75, 0.1 );
-
+     mAccountBG= new KinImage();
+     mAccountBG.AddImage( Main.lib.GetBitmap( R.drawable.label_bg ), -1 );
+     mAccountBG.SetSizePercent( 0.75, 0.1 );
+     mNicknameBG= new KinImage();
+     mNicknameBG.AddImage( Main.lib.GetBitmap( R.drawable.label_bg ), -1 );
+     mNicknameBG.SetSizePercent( 0.75, 0.1 );
+     mPasswordBG= new KinImage();
+     mPasswordBG.AddImage( Main.lib.GetBitmap( R.drawable.label_bg ), -1 );
+     mPasswordBG.SetSizePercent( 0.75, 0.1 );
+     
     mBLogout = new KinButton();
     mBLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout ), -1 );
     mBLogout.AddImage( Main.lib.GetBitmap( R.drawable.logout2 ), -1 );
@@ -139,6 +150,9 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
 
     AddChild( mBackground );
     AddChild( mTitle );
+    AddChild( mAccountBG );
+    AddChild( mNicknameBG );
+    AddChild( mPasswordBG );
     AddChild( mAccount );
     AddChild( mNickname );
     AddChild( mPassword );
@@ -161,6 +175,9 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     mAccount.SetPos( ileft, itop );
     mNickname.SetPos( ileft, itop + iHeight );
     mPassword.SetPos( ileft, itop + iHeight + iHeight );
+    mAccountBG.SetPos( ileft, itop );
+    mNicknameBG.SetPos( ileft, itop + iHeight );
+    mPasswordBG.SetPos( ileft, itop + iHeight + iHeight );
     mBLogout.SetSize( (int) ( windowHeight * 0.1 ), (int) ( windowHeight * 0.1 ) );
     mBLogout.SetPos( ileft + iWidth, itop );
     mBChangeNickname.SetSize( (int) ( windowHeight * 0.1 ), (int) ( windowHeight * 0.1 ) );
@@ -168,7 +185,6 @@ public class CMemberCenter extends KinAbsoluteLayout implements IUI {
     mBChangePassword.SetSize( (int) ( windowHeight * 0.1 ), (int) ( windowHeight * 0.1 ) );
     mBChangePassword.SetPos( ileft + iWidth, itop + iHeight + iHeight );
     mBOK.SetSize( bWidth, bHeight );
-
   }
 
   @Override

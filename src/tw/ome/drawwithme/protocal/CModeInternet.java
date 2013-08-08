@@ -38,6 +38,10 @@ public class CModeInternet implements IActionCotroller {
   SelectionKey key = null;
   ByteBuffer mBufferIn;
   SparseArray<Action> mInActions;
+  public String mAccount;
+  public int mUserId =-1;
+  public String mUserName;
+  
 
   CModeInternet() {
     sInstance = this;
@@ -85,8 +89,10 @@ public class CModeInternet implements IActionCotroller {
       @Override
       public void run() {
         try {
-          GetClient().mServer.close();
-          GetClient().mServer = null;
+          if ( GetClient().mServer != null ) {
+            GetClient().mServer.close();
+            GetClient().mServer = null;
+          }
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -159,6 +165,7 @@ public class CModeInternet implements IActionCotroller {
     // 00~00 封包自己的編號 (1 Byte)
     // 01~16 帳號(16)
     // 17~32 密碼(16)
+    GetClient().mAccount = account;
     byte text[] = new byte[33];
     text[0] = 0x02;
     byte byteAc[] = account.getBytes();
@@ -490,13 +497,13 @@ public class CModeInternet implements IActionCotroller {
           return false;
         }
         int result = ReadInt();
-        int accountNumber = ReadInt();
-        String nickname = ReadString( 32 );
+        mUserId = ReadInt();
+        mUserName = ReadString( 32 );
         String accessToken = ReadString( 32 );
         if ( result == 0 ) {
           Log.i( "0x22_0", "Login Success!" );
-          Log.i( "0x22_0", "accountNumber: " + Integer.toString( accountNumber ) );
-          Log.i( "0x22_0", "Nickname: " + nickname );
+          Log.i( "0x22_0", "accountNumber: " + Integer.toString( mUserId ) );
+          Log.i( "0x22_0", "Nickname: " + mUserName );
           Log.i( "0x22_0", "accessToken: " + accessToken );
           GetClient().mIsLogin = true;
           DrawSurface.GetInstance().mUIMenu.AfterLogin();
@@ -568,20 +575,16 @@ public class CModeInternet implements IActionCotroller {
         } else if ( result == 1 ) {
           Log.i( "0x26_1", "Password Error!" );
           Toast.makeText( DrawSurface.GetInstance().getContext(), "Password Error!", Toast.LENGTH_LONG ).show();
-        }
-        else if ( result == 2 ) {
+        } else if ( result == 2 ) {
           Log.i( "0x26_2", "Room is Full!" );
           Toast.makeText( DrawSurface.GetInstance().getContext(), "Room is Full!", Toast.LENGTH_LONG ).show();
-        }
-        else if ( result == 3 ) {
+        } else if ( result == 3 ) {
           Log.i( "0x26_3", "You were Banned!" );
           Toast.makeText( DrawSurface.GetInstance().getContext(), "You were Banned!", Toast.LENGTH_LONG ).show();
-        }
-        else if ( result == 4 ) {
+        } else if ( result == 4 ) {
           Log.i( "0x26_4", "Without Room!" );
           Toast.makeText( DrawSurface.GetInstance().getContext(), "Room does not exit!", Toast.LENGTH_LONG ).show();
-        }
-        else if ( result == 9 )
+        } else if ( result == 9 )
           Log.i( "0x26_9", "Not Login!" );
 
         return true;

@@ -25,6 +25,8 @@ public class CCanvas extends KinAbsoluteLayout {
   };
 
   IActionCotroller mProtocal;
+  Bitmap mBitmapPre;
+  Canvas mCanvasPre;
   Bitmap mBitmap;
   Canvas mCanvas;
   int mBackgroundColor;
@@ -44,6 +46,11 @@ public class CCanvas extends KinAbsoluteLayout {
   }
 
   public void New( int width, int height, int bgColor, IActionCotroller mode ) {
+
+    mBitmapPre = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 );
+    mCanvasPre = new Canvas( mBitmapPre );
+    mBitmapPre.eraseColor( 0x00000000 );
+    
     mBitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 );
     mCanvas = new Canvas( mBitmap );
     mCanvas.drawColor( bgColor );
@@ -191,8 +198,12 @@ public class CCanvas extends KinAbsoluteLayout {
     List<Action> actions = mProtocal.PullAction();
     for ( Action a : actions )
       a.Draw( mCanvas );
+    if ( mNewAction != null )
+      mNewAction.Draw( mCanvasPre );
     canvas.drawBitmap( mBitmap, mViewRect, GetViewRect(), null );
+    canvas.drawBitmap( mBitmapPre, mViewRect, GetViewRect(), null );
     super.Draw( canvas );
+    mBitmapPre.eraseColor( 0x00000000 );
     canvas.restore();
 
   }

@@ -71,7 +71,7 @@ public class CModeInternet implements IActionCotroller {
 
   public boolean Connect() {
     try {
-      InetSocketAddress addr = new InetSocketAddress( InetAddress.getByName( "lo.homedns.org" ), SERVERPORT );
+      InetSocketAddress addr = new InetSocketAddress( InetAddress.getByName( "lospot.tw" ), SERVERPORT );
       mServer = SocketChannel.open( addr );
       mServer.configureBlocking( false );
       selector = Selector.open();

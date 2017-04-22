@@ -8,31 +8,31 @@ import tw.ome.drawwithme.DrawSurface;
 
 public class CModeSingle implements IActionCotroller {
 
-  List<Action> mActions;
+    List<Action> mActions;
 
-  public CModeSingle() {
-    mActions = Collections.synchronizedList( new LinkedList<Action>() );
-  }
-
-  public void PushAction( Action newAction ) {
-    mActions.add( newAction );
-
-    DrawSurface.GetInstance().RequireRedraw();
-  }
-
-  public boolean HasNewAction() {
-    if ( !mActions.isEmpty() )
-      return true;
-    return false;
-  }
-
-  public List<Action> PullAction() {
-    List<Action> relist = new LinkedList<Action>();
-    while ( !mActions.isEmpty() ) {
-      Action exe = mActions.remove( 0 );
-      relist.add( exe );
+    public CModeSingle() {
+        mActions = Collections.synchronizedList(new LinkedList<Action>());
     }
 
-    return relist;
-  }
+    public void PushAction(Action newAction) {
+        mActions.add(newAction);
+
+        DrawSurface.GetInstance().RequireRedraw();
+    }
+
+    public boolean HasNewAction() {
+        if (!mActions.isEmpty())
+            return true;
+        return false;
+    }
+
+    public List<Action> PullAction() {
+        List<Action> relist = new LinkedList<Action>();
+        while (!mActions.isEmpty()) {
+            Action exe = mActions.remove(0);
+            relist.add(exe);
+        }
+
+        return relist;
+    }
 }

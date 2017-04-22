@@ -6,19 +6,19 @@ import android.view.MotionEvent;
 
 public interface IUI {
 
-  public void onStart( IUI from );
+    public void onStart(IUI from);
 
-  public void onQuit( IUI to );
+    public void onQuit(IUI to);
 
-  public void Draw( Canvas canvas );
+    public void Draw(Canvas canvas);
 
-  public void LoadContent();
+    public void LoadContent();
 
-  public void CompatibleWith( double windowWidth, double windowHeight );
+    public void CompatibleWith(double windowWidth, double windowHeight);
 
-  public boolean onTouchEvent( MotionEvent event );
+    public boolean onTouchEvent(MotionEvent event);
 
-  public boolean onKeyDown( int keycode, KeyEvent event );
+    public boolean onKeyDown(int keycode, KeyEvent event);
 
-  public boolean HasUpdate();
+    public boolean HasUpdate();
 }
